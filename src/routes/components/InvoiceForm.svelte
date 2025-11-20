@@ -8,6 +8,41 @@
 
 	// Create a reactive reference to the invoice
 	let invoice = $derived(invoiceState.invoice);
+	let validationErrors = $derived(invoiceState.validationErrors);
+
+	// Trigger validation whenever the invoice object changes
+	$effect(() => {
+		invoiceState.validateInvoice();
+	});
+
+	// Helper function to get error for a specific path
+	function getError(path: string): string | undefined {
+		if (!validationErrors) return undefined;
+
+		// eslint-disable-next-line @typescript-eslint/no-explicit-any
+		let currentError: any = validationErrors; // Start with the full error object
+
+		const parts = path.split('.');
+		for (let i = 0; i < parts.length; i++) {
+			const part = parts[i];
+			if (currentError && typeof currentError === 'object' && part in currentError) {
+				currentError = currentError[part];
+			} else {
+				return undefined; // Path not found
+			}
+		}
+
+		// At the end of the path, check for _errors
+		if (
+			currentError &&
+			typeof currentError === 'object' &&
+			'_errors' in currentError &&
+			currentError._errors.length > 0
+		) {
+			return currentError._errors[0];
+		}
+		return undefined;
+	}
 
 	function handleLogoUpload(event: Event) {
 		const target = event.target as HTMLInputElement;
@@ -93,8 +128,17 @@
 							type="number"
 							id="input-payment-days"
 							bind:value={invoice.settings.paymentDays}
-							class="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
+							class="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 {getError(
+								'settings.paymentDays'
+							)
+								? 'border-destructive'
+								: ''}"
 						/>
+						{#if getError('settings.paymentDays')}
+							<p class="text-sm font-medium text-destructive dark:text-error-text">
+								{getError('settings.paymentDays')}
+							</p>
+						{/if}
 					</div>
 					<div class="space-y-2">
 						<label class="text-sm font-medium text-foreground" for="input-vat-rate"
@@ -104,8 +148,17 @@
 							type="number"
 							id="input-vat-rate"
 							bind:value={invoice.settings.vatRate}
-							class="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
+							class="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 {getError(
+								'settings.vatRate'
+							)
+								? 'border-destructive'
+								: ''}"
 						/>
+						{#if getError('settings.vatRate')}
+							<p class="text-sm font-medium text-destructive dark:text-error-text">
+								{getError('settings.vatRate')}
+							</p>
+						{/if}
 					</div>
 					<div class="space-y-2">
 						<label class="text-sm font-medium text-foreground" for="input-currency">Währung</label>
@@ -210,8 +263,17 @@
 							type="text"
 							id="input-customer-name"
 							bind:value={invoice.customer.name}
-							class="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
+							class="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 {getError(
+								'customer.name'
+							)
+								? 'border-destructive'
+								: ''}"
 						/>
+						{#if getError('customer.name')}
+							<p class="text-sm font-medium text-error-text">
+								{getError('customer.name')}
+							</p>
+						{/if}
 					</div>
 					<div class="space-y-2 md:col-span-2">
 						<label class="text-sm font-medium text-foreground" for="input-customer-street"
@@ -221,8 +283,17 @@
 							type="text"
 							id="input-customer-street"
 							bind:value={invoice.customer.street}
-							class="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
+							class="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 {getError(
+								'customer.street'
+							)
+								? 'border-destructive'
+								: ''}"
 						/>
+						{#if getError('customer.street')}
+							<p class="text-sm font-medium text-error-text">
+								{getError('customer.street')}
+							</p>
+						{/if}
 					</div>
 					<div class="space-y-2">
 						<label class="text-sm font-medium text-foreground" for="input-customer-zip">PLZ</label>
@@ -230,8 +301,17 @@
 							type="text"
 							id="input-customer-zip"
 							bind:value={invoice.customer.zip}
-							class="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
+							class="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 {getError(
+								'customer.zip'
+							)
+								? 'border-destructive'
+								: ''}"
 						/>
+						{#if getError('customer.zip')}
+							<p class="text-sm font-medium text-error-text">
+								{getError('customer.zip')}
+							</p>
+						{/if}
 					</div>
 					<div class="space-y-2">
 						<label class="text-sm font-medium text-foreground" for="input-customer-city"
@@ -241,8 +321,17 @@
 							type="text"
 							id="input-customer-city"
 							bind:value={invoice.customer.city}
-							class="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
+							class="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 {getError(
+								'customer.city'
+							)
+								? 'border-destructive'
+								: ''}"
 						/>
+						{#if getError('customer.city')}
+							<p class="text-sm font-medium text-error-text">
+								{getError('customer.city')}
+							</p>
+						{/if}
 					</div>
 				</div>
 			</Accordion.Content>
@@ -284,8 +373,17 @@
 							type="text"
 							id="input-sender-name"
 							bind:value={invoice.sender.name}
-							class="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
+							class="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 {getError(
+								'sender.name'
+							)
+								? 'border-destructive'
+								: ''}"
 						/>
+						{#if getError('sender.name')}
+							<p class="text-sm font-medium text-error-text">
+								{getError('sender.name')}
+							</p>
+						{/if}
 					</div>
 					<div class="space-y-2 md:col-span-2">
 						<label class="text-sm font-medium text-foreground" for="input-sender-street"
@@ -295,8 +393,17 @@
 							type="text"
 							id="input-sender-street"
 							bind:value={invoice.sender.street}
-							class="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
+							class="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 {getError(
+								'sender.street'
+							)
+								? 'border-destructive'
+								: ''}"
 						/>
+						{#if getError('sender.street')}
+							<p class="text-sm font-medium text-error-text">
+								{getError('sender.street')}
+							</p>
+						{/if}
 					</div>
 					<div class="space-y-2">
 						<label class="text-sm font-medium text-foreground" for="input-sender-zip">PLZ</label>
@@ -304,8 +411,17 @@
 							type="text"
 							id="input-sender-zip"
 							bind:value={invoice.sender.zip}
-							class="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
+							class="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 {getError(
+								'sender.zip'
+							)
+								? 'border-destructive'
+								: ''}"
 						/>
+						{#if getError('sender.zip')}
+							<p class="text-sm font-medium text-error-text">
+								{getError('sender.zip')}
+							</p>
+						{/if}
 					</div>
 					<div class="space-y-2">
 						<label class="text-sm font-medium text-foreground" for="input-sender-city">Stadt</label>
@@ -313,8 +429,17 @@
 							type="text"
 							id="input-sender-city"
 							bind:value={invoice.sender.city}
-							class="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
+							class="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 {getError(
+								'sender.city'
+							)
+								? 'border-destructive'
+								: ''}"
 						/>
+						{#if getError('sender.city')}
+							<p class="text-sm font-medium text-error-text">
+								{getError('sender.city')}
+							</p>
+						{/if}
 					</div>
 
 					<div class="md:col-span-2">
@@ -329,8 +454,17 @@
 							type="text"
 							id="input-sender-email"
 							bind:value={invoice.sender.email}
-							class="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
+							class="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 {getError(
+								'sender.email'
+							)
+								? 'border-destructive'
+								: ''}"
 						/>
+						{#if getError('sender.email')}
+							<p class="text-sm font-medium text-error-text">
+								{getError('sender.email')}
+							</p>
+						{/if}
 					</div>
 					<div class="space-y-2">
 						<label class="text-sm font-medium text-foreground" for="input-sender-website"
@@ -340,8 +474,17 @@
 							type="text"
 							id="input-sender-website"
 							bind:value={invoice.sender.website}
-							class="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
+							class="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 {getError(
+								'sender.website'
+							)
+								? 'border-destructive'
+								: ''}"
 						/>
+						{#if getError('sender.website')}
+							<p class="text-sm font-medium text-error-text">
+								{getError('sender.website')}
+							</p>
+						{/if}
 					</div>
 
 					<div class="md:col-span-2">
@@ -366,8 +509,17 @@
 							type="text"
 							id="input-sender-iban"
 							bind:value={invoice.sender.iban}
-							class="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
+							class="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 {getError(
+								'sender.iban'
+							)
+								? 'border-destructive'
+								: ''}"
 						/>
+						{#if getError('sender.iban')}
+							<p class="text-sm font-medium text-error-text">
+								{getError('sender.iban')}
+							</p>
+						{/if}
 					</div>
 					<div class="space-y-2">
 						<label class="text-sm font-medium text-foreground" for="input-sender-bic">BIC</label>
@@ -375,8 +527,17 @@
 							type="text"
 							id="input-sender-bic"
 							bind:value={invoice.sender.bic}
-							class="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
+							class="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 {getError(
+								'sender.bic'
+							)
+								? 'border-destructive'
+								: ''}"
 						/>
+						{#if getError('sender.bic')}
+							<p class="text-sm font-medium text-error-text">
+								{getError('sender.bic')}
+							</p>
+						{/if}
 					</div>
 					<div class="space-y-2">
 						<label class="text-sm font-medium text-foreground" for="input-sender-tax-id"
@@ -386,8 +547,17 @@
 							type="text"
 							id="input-sender-tax-id"
 							bind:value={invoice.sender.taxId}
-							class="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
+							class="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 {getError(
+								'sender.taxId'
+							)
+								? 'border-destructive'
+								: ''}"
 						/>
+						{#if getError('sender.taxId')}
+							<p class="text-sm font-medium text-error-text">
+								{getError('sender.taxId')}
+							</p>
+						{/if}
 					</div>
 					<div class="space-y-2">
 						<label class="text-sm font-medium text-foreground" for="input-sender-vat-id"
@@ -397,8 +567,17 @@
 							type="text"
 							id="input-sender-vat-id"
 							bind:value={invoice.sender.vatId}
-							class="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
+							class="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 {getError(
+								'sender.vatId'
+							)
+								? 'border-destructive'
+								: ''}"
 						/>
+						{#if getError('sender.vatId')}
+							<p class="text-sm font-medium text-error-text">
+								{getError('sender.vatId')}
+							</p>
+						{/if}
 					</div>
 				</div>
 			</Accordion.Content>

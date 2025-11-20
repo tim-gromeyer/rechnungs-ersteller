@@ -1,6 +1,11 @@
 import type { Invoice } from './types';
 import { generateInvoiceNumber } from './utils/invoice-number';
 import { browser } from '$app/environment';
+import { invoiceSchema } from './validation'; // Import the Zod schema
+import { z } from 'zod'; // Import z from zod
+
+// Type for storing validation errors
+type InvoiceValidationErrors = z.ZodFormattedError<Invoice> | null;
 
 function loadInvoice(): Invoice {
 	const defaultInvoice = getDefaultInvoice();
@@ -83,6 +88,18 @@ function getDefaultInvoice(): Invoice {
 
 function createInvoiceState() {
 	let invoice = $state<Invoice>(loadInvoice());
+	let validationErrors = $state<InvoiceValidationErrors>(null);
+
+	// Function to validate the current invoice state
+	function validateInvoice() {
+		const result = invoiceSchema.safeParse(invoice);
+		if (!result.success) {
+			validationErrors = result.error.format();
+		} else {
+			validationErrors = null;
+		}
+		return result.success; // Return validation status
+	}
 
 	return {
 		get invoice() {
@@ -91,6 +108,16 @@ function createInvoiceState() {
 		set invoice(v) {
 			invoice = v;
 		},
+
+		get validationErrors() {
+			return validationErrors;
+		},
+
+		get isValid() {
+			return validationErrors === null;
+		},
+
+		validateInvoice, // Expose the validation function
 
 		addArticle: () => {
 			invoice.articles.push({
