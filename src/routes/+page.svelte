@@ -5,7 +5,7 @@
 	import StatePersistence from './components/StatePersistence.svelte';
 	import { invoiceState } from '$lib/state.svelte';
 	import { generateZugferdXml } from '$lib/utils/zugferd';
-	import { Printer, Download, Moon, Sun } from 'lucide-svelte';
+	import { Printer, Download, Moon, Sun, FileText } from 'lucide-svelte';
 	import { toggleMode } from 'mode-watcher';
 	import { cn } from '$lib/utils/cn';
 
@@ -40,6 +40,16 @@
 		document.body.removeChild(a);
 		URL.revokeObjectURL(url);
 	}
+
+	function handleNewInvoice() {
+		if (
+			confirm(
+				'Neue Rechnung erstellen? Die aktuellen Kundendaten und Positionen werden zurückgesetzt.'
+			)
+		) {
+			invoiceState.createNewInvoice();
+		}
+	}
 </script>
 
 <StatePersistence>
@@ -57,7 +67,7 @@
 					href="/"
 					class="flex items-center gap-2 text-xl font-semibold tracking-tight transition-colors hover:text-primary"
 				>
-					Invoice Creator
+					Rechnungs-Ersteller
 				</a>
 				<!-- eslint-enable svelte/no-navigation-without-resolve -->
 				<div class="flex items-center gap-2">
@@ -73,6 +83,15 @@
 						{:else}
 							<Moon size={20} />
 						{/if}
+					</button>
+					<button
+						onclick={handleNewInvoice}
+						class={cn(
+							'inline-flex h-10 items-center justify-center gap-2 rounded-lg border border-input bg-background px-4 text-sm font-medium transition-all hover:scale-105 hover:bg-accent hover:text-accent-foreground active:scale-95'
+						)}
+					>
+						<FileText size={18} />
+						<span class="hidden sm:inline">Neue Rechnung</span>
 					</button>
 					<button
 						onclick={handlePrint}

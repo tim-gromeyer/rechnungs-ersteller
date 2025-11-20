@@ -26,11 +26,7 @@ export function calculateGrossTotal(netTotal: number, vatTotal: number): number 
 	return netTotal + vatTotal;
 }
 
-export function formatCurrency(
-	amount: number,
-	currency: string = 'EUR',
-	locale: string
-): string {
+export function formatCurrency(amount: number, currency: string = 'EUR', locale: string): string {
 	return new Intl.NumberFormat(locale, {
 		style: 'currency',
 		currency: currency,

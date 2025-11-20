@@ -1,0 +1,16 @@
+{
+  "name": "Rechnungs Ersteller",
+  "short_name": "Rechnung",
+  "description": "Erstellen Sie schnell und einfach Rechnungen",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#ffffff",
+  "theme_color": "#ffffff",
+  "icons": [
+    {
+      "src": "/favicon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml"
+    }
+  ]
+}

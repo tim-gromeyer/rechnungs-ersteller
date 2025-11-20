@@ -3,9 +3,11 @@
 	import { Plus, Trash2, X, ChevronDown } from 'lucide-svelte';
 	import { Accordion } from 'bits-ui';
 
-	let { invoice, addArticle, removeArticle, addDiscount, removeDiscount } = invoiceState;
+	// Don't destructure invoice - access it reactively through invoiceState
+	const { addArticle, removeArticle, addDiscount, removeDiscount } = invoiceState;
 
-	let logoInput: HTMLInputElement;
+	// Create a reactive reference to the invoice
+	let invoice = $derived(invoiceState.invoice);
 
 	function handleLogoUpload(event: Event) {
 		const target = event.target as HTMLInputElement;
@@ -14,14 +16,17 @@
 
 		const reader = new FileReader();
 		reader.onload = (e) => {
-			invoice.settings.logoPath = e.target?.result as string;
+			invoiceState.invoice.settings.logoPath = e.target?.result as string;
 		};
 		reader.readAsDataURL(file);
 	}
 
 	function removeLogo() {
-		invoice.settings.logoPath = undefined;
-		if (logoInput) logoInput.value = '';
+		invoiceState.invoice.settings.logoPath = undefined;
+		const logoInput = document.getElementById('input-logo') as HTMLInputElement;
+		if (logoInput) {
+			logoInput.value = '';
+		}
 	}
 </script>
 
@@ -134,7 +139,6 @@
 								type="file"
 								id="input-logo"
 								accept="image/*"
-								bind:this={logoInput}
 								onchange={handleLogoUpload}
 								class="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
 							/>

@@ -11,7 +11,8 @@
 		formatDate
 	} from '$lib/utils/calculations';
 
-	let { invoice } = invoiceState;
+	// Create a reactive reference to the invoice
+	let invoice = $derived(invoiceState.invoice);
 
 	// Derived calculations
 	let subtotal = $derived(calculateSubtotal(invoice.articles));
