@@ -2,7 +2,7 @@
 	import { onMount } from 'svelte';
 	import InvoiceForm from './components/InvoiceForm.svelte';
 	import InvoicePreview from './components/InvoicePreview.svelte';
-	import PersistenceWatcher from './components/PersistenceWatcher.svelte';
+	import StatePersistence from './components/StatePersistence.svelte';
 	import { invoiceState } from '$lib/state.svelte';
 	import { generateZugferdXml } from '$lib/utils/zugferd';
 	import { Printer, Download, Moon, Sun } from 'lucide-svelte';
@@ -42,7 +42,7 @@
 	}
 </script>
 
-<PersistenceWatcher>
+<StatePersistence>
 	<div
 		class="flex min-h-screen flex-col bg-gradient-to-br from-background via-background to-muted/20"
 	>
@@ -117,7 +117,7 @@
 			</div>
 		</main>
 	</div>
-</PersistenceWatcher>
+</StatePersistence>
 
 <style>
 	@media print {

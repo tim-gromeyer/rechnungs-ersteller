@@ -1,51 +1,45 @@
-import type { Invoice, Sender } from './types';
+import type { Invoice } from './types';
 import { generateInvoiceNumber } from './utils/invoice-number';
+import { browser } from '$app/environment';
 
-// Load sender data from localStorage
-function loadSenderData(): Sender {
-	if (typeof window === 'undefined') {
-		return getDefaultSender();
+function loadInvoice(): Invoice {
+	if (!browser) {
+		return getDefaultInvoice();
 	}
 
-	const stored = localStorage.getItem('invoice-sender');
+	const stored = localStorage.getItem('invoice-state');
 	if (stored) {
 		try {
-			return JSON.parse(stored);
+			// Basic validation to ensure the stored data is a valid invoice
+			const parsed = JSON.parse(stored);
+			if (parsed && typeof parsed === 'object' && 'articles' in parsed) {
+				return parsed;
+			}
 		} catch {
-			return getDefaultSender();
+			// Fallback to default if parsing fails
 		}
 	}
-	return getDefaultSender();
+	return getDefaultInvoice();
 }
 
-function getDefaultSender(): Sender {
+function getDefaultInvoice(): Invoice {
 	return {
-		name: 'Max Mustermann',
-		street: 'Musterstraße 123',
-		zip: '12345',
-		city: 'Berlin',
-		email: 'max@beispiel.de',
-		phone: '+49 123 456789',
-		website: 'www.beispiel.de',
-		iban: 'DE12 3456 7890 1234 5678 90',
-		bic: 'ABCDEFGH',
-		taxId: '123/456/7890'
-	};
-}
-
-// Save sender data to localStorage
-function saveSenderData(sender: Sender) {
-	if (typeof window === 'undefined') return;
-	localStorage.setItem('invoice-sender', JSON.stringify(sender));
-}
-
-function createInvoiceState() {
-	let invoice = $state<Invoice>({
-		number: typeof window !== 'undefined' ? generateInvoiceNumber() : '2025-01-1',
+		number: browser ? generateInvoiceNumber() : '2025-01-1',
 		date: new Date().toISOString().split('T')[0],
 		serviceDate: 'today',
 		paymentDate: new Date(Date.now() + 14 * 24 * 60 * 60 * 1000).toISOString().split('T')[0],
-		sender: loadSenderData(),
+		sender: {
+			name: 'Max Mustermann',
+			street: 'Musterstraße 123',
+			zip: '12345',
+			city: 'Berlin',
+			email: 'max@beispiel.de',
+			phone: '+49 123 456789',
+			website: 'www.beispiel.de',
+			iban: 'DE12 3456 7890 1234 5678 90',
+			bic: 'ABCDEFGH',
+			taxId: '123/456/7890'
+		},
 		customer: {
 			company: 'Musterfirma GmbH',
 			name: 'Erika Mustermann',
@@ -59,6 +53,7 @@ function createInvoiceState() {
 		],
 		discounts: [],
 		settings: {
+			locale: 'de-DE',
 			vatRate: 0,
 			currency: 'EUR',
 			paymentDays: 14,
@@ -68,7 +63,11 @@ function createInvoiceState() {
 			taxNote: 'Gemäß § 19 UStG wird keine Umsatzsteuer berechnet.'
 		},
 		message: 'Vielen Dank für Ihren Auftrag!'
-	});
+	};
+}
+
+function createInvoiceState() {
+	let invoice = $state<Invoice>(loadInvoice());
 
 	return {
 		get invoice() {
@@ -76,12 +75,6 @@ function createInvoiceState() {
 		},
 		set invoice(v) {
 			invoice = v;
-		},
-
-		// Save sender data whenever it changes
-		updateSender: (sender: Sender) => {
-			invoice.sender = sender;
-			saveSenderData(sender);
 		},
 
 		addArticle: () => {

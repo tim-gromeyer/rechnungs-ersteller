@@ -41,6 +41,7 @@ export interface Discount {
 }
 
 export interface InvoiceSettings {
+	locale: string; // e.g. 'de-DE'
 	vatRate: number; // e.g. 19.0
 	currency: string; // e.g. "EUR"
 	paymentDays: number; // Default 14

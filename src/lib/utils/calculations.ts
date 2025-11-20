@@ -29,7 +29,7 @@ export function calculateGrossTotal(netTotal: number, vatTotal: number): number 
 export function formatCurrency(
 	amount: number,
 	currency: string = 'EUR',
-	locale: string = 'de-DE'
+	locale: string
 ): string {
 	return new Intl.NumberFormat(locale, {
 		style: 'currency',
@@ -39,7 +39,7 @@ export function formatCurrency(
 	}).format(amount);
 }
 
-export function formatDate(dateString: string, locale: string = 'de-DE'): string {
+export function formatDate(dateString: string, locale: string): string {
 	if (!dateString || dateString === 'today') {
 		return new Date().toLocaleDateString(locale);
 	}

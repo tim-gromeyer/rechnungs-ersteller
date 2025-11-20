@@ -22,7 +22,7 @@
 </script>
 
 <div
-	class="invoice-preview relative mx-auto h-[297mm] w-[210mm] flex-shrink-0 bg-white p-[15mm] font-sans text-[11px] leading-tight text-black shadow-xl ring-1 ring-black/5 print:m-0 print:w-full print:p-[15mm] print:shadow-none print:ring-0"
+	class="invoice-preview mx-auto flex h-[297mm] w-[210mm] flex-col flex-shrink-0 bg-white px-[15mm] py-[10mm] font-sans text-[11px] leading-tight text-black shadow-xl ring-1 ring-black/5 print:m-0 print:w-full print:px-[15mm] print:pt-[10mm] print:pb-[5mm] print:shadow-none print:ring-0"
 >
 	<!-- Header / Logo -->
 	<div class="mb-4 flex items-start justify-between">
@@ -70,118 +70,140 @@
 			{#if invoice.sender.taxId}<div class="pt-0.5">Steuernr.: {invoice.sender.taxId}</div>{/if}
 			<div class="pt-1"></div>
 			<div>
-				Datum: <strong>{formatDate(invoice.date)}</strong> • Nr.: <strong>{invoice.number}</strong>
+				Datum: <strong>{formatDate(invoice.date, invoice.settings.locale)}</strong> • Nr.: <strong>{invoice.number}</strong>
 			</div>
-			<div>Leistung: <strong>{formatDate(invoice.serviceDate)}</strong></div>
+			<div>Leistung: <strong>{formatDate(invoice.serviceDate, invoice.settings.locale)}</strong></div>
 		</div>
 	</div>
 
 	<!-- Title -->
 	<h1 class="mb-3 text-lg font-bold text-gray-900">Rechnung</h1>
 
-	<!-- Message -->
-	{#if invoice.message}
-		<p class="mb-3 text-[10px] text-gray-700">{invoice.message}</p>
-	{/if}
+	<div class="flex-grow">
+		<!-- Message -->
+		{#if invoice.message}
+			<p class="mb-3 text-[10px] text-gray-700">{invoice.message}</p>
+		{/if}
 
-	<!-- Articles Table -->
-	<table class="mb-3 w-full border-collapse text-left text-[10px]">
-		<thead>
-			<tr class="border-b border-gray-900">
-				<th class="w-1/2 py-1 text-[10px] font-semibold text-gray-700">Bezeichnung</th>
-				<th class="py-1 text-right text-[10px] font-semibold text-gray-700">Preis</th>
-				<th class="py-1 text-right text-[10px] font-semibold text-gray-700">Menge</th>
-				<th class="py-1 text-right text-[10px] font-semibold text-gray-700">Betrag</th>
-			</tr>
-		</thead>
-		<tbody>
-			{#each invoice.articles as article (article.id)}
-				<tr class="border-b border-gray-100">
-					<td class="py-1">
-						<div class="font-medium text-gray-900">{article.description}</div>
-						{#if article.summary}
-							<div class="text-[9px] text-gray-500">{article.summary}</div>
-						{/if}
-					</td>
-					<td class="py-1 text-right text-gray-700"
-						>{formatCurrency(article.pricePerUnit, invoice.settings.currency)}</td
-					>
-					<td class="py-1 text-right text-gray-700">{article.amount}</td>
-					<td class="py-1 text-right font-medium text-gray-900"
-						>{formatCurrency(calculateArticleTotal(article), invoice.settings.currency)}</td
+		<!-- Articles Table -->
+		<table class="mb-3 w-full border-collapse text-left text-[10px]">
+			<thead>
+				<tr class="border-b border-gray-900">
+					<th class="w-1/2 py-1 text-[10px] font-semibold text-gray-700">Bezeichnung</th>
+					<th class="py-1 text-right text-[10px] font-semibold text-gray-700">Preis</th>
+					<th class="py-1 text-right text-[10px] font-semibold text-gray-700">Menge</th>
+					<th class="py-1 text-right text-[10px] font-semibold text-gray-700">Betrag</th>
+				</tr>
+			</thead>
+			<tbody>
+				{#each invoice.articles as article (article.id)}
+					<tr class="border-b border-gray-100">
+						<td class="py-1">
+							<div class="font-medium text-gray-900">{article.description}</div>
+							{#if article.summary}
+								<div class="text-[9px] text-gray-500">{article.summary}</div>
+							{/if}
+						</td>
+						<td class="py-1 text-right text-gray-700"
+							>{formatCurrency(
+								article.pricePerUnit,
+								invoice.settings.currency,
+								invoice.settings.locale
+							)}</td
+						>
+						<td class="py-1 text-right text-gray-700">{article.amount}</td>
+						<td class="py-1 text-right font-medium text-gray-900"
+							>{formatCurrency(
+								calculateArticleTotal(article),
+								invoice.settings.currency,
+								invoice.settings.locale
+							)}</td
+						>
+					</tr>
+				{/each}
+				{#each invoice.discounts as discount (discount.id)}
+					<tr class="border-b border-gray-100">
+						<td class="py-1 text-green-700">{discount.description}</td>
+						<td class="py-1 text-right text-gray-400">-</td>
+						<td class="py-1 text-right text-gray-400">-</td>
+						<td class="py-1 text-right font-medium text-green-700"
+							>-{formatCurrency(
+								discount.amount,
+								invoice.settings.currency,
+								invoice.settings.locale
+							)}</td
+						>
+					</tr>
+				{/each}
+			</tbody>
+			<tfoot>
+				<tr>
+					<td colspan="2" class="py-0.5 text-gray-700">Zwischensumme</td>
+					<td colspan="2" class="py-0.5 text-right text-gray-700"
+						>{formatCurrency(subtotal, invoice.settings.currency, invoice.settings.locale)}</td
 					>
 				</tr>
-			{/each}
-			{#each invoice.discounts as discount (discount.id)}
-				<tr class="border-b border-gray-100">
-					<td class="py-1 text-green-700">{discount.description}</td>
-					<td class="py-1 text-right text-gray-400">-</td>
-					<td class="py-1 text-right text-gray-400">-</td>
-					<td class="py-1 text-right font-medium text-green-700"
-						>-{formatCurrency(discount.amount, invoice.settings.currency)}</td
+				<tr>
+					<td colspan="2" class="py-0.5 text-gray-700">Rabatt</td>
+					<td colspan="2" class="py-0.5 text-right text-green-700"
+						>-{formatCurrency(
+							discountTotal,
+							invoice.settings.currency,
+							invoice.settings.locale
+						)}</td
 					>
 				</tr>
-			{/each}
-		</tbody>
-		<tfoot>
-			<tr>
-				<td colspan="2" class="py-0.5 text-gray-700">Zwischensumme</td>
-				<td colspan="2" class="py-0.5 text-right text-gray-700"
-					>{formatCurrency(subtotal, invoice.settings.currency)}</td
-				>
-			</tr>
-			<tr>
-				<td colspan="2" class="py-0.5 text-gray-700">Rabatt</td>
-				<td colspan="2" class="py-0.5 text-right text-green-700"
-					>-{formatCurrency(discountTotal, invoice.settings.currency)}</td
-				>
-			</tr>
-			<tr class="border-t border-gray-900">
-				<td colspan="2" class="py-1 text-gray-700">Netto</td>
-				<td colspan="2" class="py-1 text-right font-medium text-gray-900"
-					>{formatCurrency(netTotal, invoice.settings.currency)}</td
-				>
-			</tr>
-			<tr>
-				<td colspan="2" class="py-0.5 text-gray-700">zzgl. MwSt. {invoice.settings.vatRate}%</td>
-				<td colspan="2" class="py-0.5 text-right text-gray-700"
-					>{formatCurrency(vatTotal, invoice.settings.currency)}</td
-				>
-			</tr>
-			<tr class="font-bold">
-				<td colspan="2" class="py-1 text-gray-900">Brutto</td>
-				<td colspan="2" class="py-1 text-right text-sm text-gray-900"
-					>{formatCurrency(grossTotal, invoice.settings.currency)}</td
-				>
-			</tr>
-		</tfoot>
-	</table>
+				<tr class="border-t border-gray-900">
+					<td colspan="2" class="py-1 text-gray-700">Netto</td>
+					<td colspan="2" class="py-1 text-right font-medium text-gray-900"
+						>{formatCurrency(netTotal, invoice.settings.currency, invoice.settings.locale)}</td
+					>
+				</tr>
+				<tr>
+					<td colspan="2" class="py-0.5 text-gray-700">zzgl. MwSt. {invoice.settings.vatRate}%</td>
+					<td colspan="2" class="py-0.5 text-right text-gray-700"
+						>{formatCurrency(vatTotal, invoice.settings.currency, invoice.settings.locale)}</td
+					>
+				</tr>
+				<tr class="font-bold">
+					<td colspan="2" class="py-1 text-gray-900">Brutto</td>
+					<td colspan="2" class="py-1 text-right text-sm text-gray-900"
+						>{formatCurrency(
+							grossTotal,
+							invoice.settings.currency,
+							invoice.settings.locale
+						)}</td
+					>
+				</tr>
+			</tfoot>
+		</table>
 
-	<!-- Payment Info -->
-	<div class="mt-4 text-[10px] text-gray-700">
-		{#if invoice.settings.paymentText}
-			<p class="mb-2">{invoice.settings.paymentText}</p>
-		{/if}
+		<!-- Payment Info -->
+		<div class="mt-4 text-[10px] text-gray-700">
+			{#if invoice.settings.paymentText}
+				<p class="mb-2">{invoice.settings.paymentText}</p>
+			{/if}
 
-		<!-- Tax Note (only if VAT is 0 and taxNote is set) -->
-		{#if invoice.settings.vatRate === 0 && invoice.settings.taxNote}
-			<p class="mb-2 text-[9px] italic text-gray-600">
-				{invoice.settings.taxNote}
-			</p>
-		{/if}
+			<!-- Tax Note (only if VAT is 0 and taxNote is set) -->
+			{#if invoice.settings.vatRate === 0 && invoice.settings.taxNote}
+				<p class="mb-2 text-[9px] italic text-gray-600">
+					{invoice.settings.taxNote}
+				</p>
+			{/if}
 
-		{#if invoice.sender.bankName || invoice.sender.iban}
-			<div class="mt-3 text-[9px] text-gray-600">
-				{#if invoice.sender.bankName}<div>Bank: {invoice.sender.bankName}</div>{/if}
-				{#if invoice.sender.iban}<div>IBAN: {invoice.sender.iban}</div>{/if}
-				{#if invoice.sender.bic}<div>BIC: {invoice.sender.bic}</div>{/if}
-			</div>
-		{/if}
+			{#if invoice.sender.bankName || invoice.sender.iban}
+				<div class="mt-3 text-[9px] text-gray-600">
+					{#if invoice.sender.bankName}<div>Bank: {invoice.sender.bankName}</div>{/if}
+					{#if invoice.sender.iban}<div>IBAN: {invoice.sender.iban}</div>{/if}
+					{#if invoice.sender.bic}<div>BIC: {invoice.sender.bic}</div>{/if}
+				</div>
+			{/if}
+		</div>
 	</div>
 
 	<!-- Footer - Positioned at absolute bottom -->
 	<div
-		class="absolute bottom-[15mm] left-[15mm] right-[15mm] border-t border-gray-200 pt-2 text-center text-[9px] text-gray-500"
+		class="border-t border-gray-200 pt-2 text-center text-[9px] text-gray-500"
 	>
 		{invoice.sender.company || invoice.sender.name}
 		{#if invoice.sender.email}
