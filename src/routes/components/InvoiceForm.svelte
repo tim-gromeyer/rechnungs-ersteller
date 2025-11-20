@@ -452,7 +452,7 @@
 					<div class="col-span-2 flex justify-end md:col-span-1">
 						<button
 							onclick={() => removeArticle(article.id)}
-							class="inline-flex h-9 w-9 items-center justify-center rounded-md text-destructive transition-colors hover:bg-destructive/10"
+							class="inline-flex h-9 w-9 items-center justify-center rounded-md bg-destructive text-destructive-foreground transition-colors hover:bg-destructive/90 active:scale-95"
 						>
 							<Trash2 size={16} />
 						</button>
@@ -496,7 +496,7 @@
 					<div class="col-span-1 flex justify-end">
 						<button
 							onclick={() => removeDiscount(discount.id)}
-							class="inline-flex h-9 w-9 items-center justify-center rounded-md text-destructive transition-colors hover:bg-destructive/10"
+							class="inline-flex h-9 w-9 items-center justify-center rounded-md bg-destructive text-destructive-foreground transition-colors hover:bg-destructive/90 active:scale-95"
 						>
 							<Trash2 size={16} />
 						</button>

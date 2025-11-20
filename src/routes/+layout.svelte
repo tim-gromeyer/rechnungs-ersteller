@@ -1,6 +1,5 @@
 <script>
 	import '../app.css';
-	import favicon from '$lib/assets/favicon.svg';
 	import { ModeWatcher } from 'mode-watcher';
 
 	let { children } = $props();
@@ -9,7 +8,6 @@
 <ModeWatcher />
 
 <svelte:head>
-	<link rel="icon" href={favicon} />
 	<title>Rechnungs-Ersteller - Rechnungs-Assistent</title>
 	<meta name="description" content="Modern invoice generator with ZUGFeRD support" />
 </svelte:head>
