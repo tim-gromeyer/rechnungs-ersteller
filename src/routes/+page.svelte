@@ -133,17 +133,7 @@
 		}
 
 		:global(html) {
-			height: auto !important;
-			overflow: hidden !important;
-		}
-
-		/* Ensure invoice fits on one page */
-		:global(.invoice-preview) {
-			page-break-after: avoid !important;
-			break-after: avoid !important;
-			height: auto !important;
-			max-height: 297mm !important;
-			overflow: hidden !important;
+			background-color: white !important;
 		}
 	}
 </style>

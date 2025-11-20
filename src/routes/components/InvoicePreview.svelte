@@ -22,7 +22,7 @@
 </script>
 
 <div
-	class="invoice-preview mx-auto flex h-[297mm] w-[210mm] flex-col flex-shrink-0 bg-white px-[15mm] py-[10mm] font-sans text-[11px] leading-tight text-black shadow-xl ring-1 ring-black/5 print:m-0 print:w-full print:px-[15mm] print:pt-[10mm] print:pb-[5mm] print:shadow-none print:ring-0"
+	class="invoice-preview mx-auto flex min-h-[297mm] w-[210mm] flex-shrink-0 flex-col bg-white px-[15mm] py-[10mm] font-sans text-[11px] leading-tight text-black shadow-xl ring-1 ring-black/5 print:m-0 print:min-h-0 print:w-full print:shadow-none print:ring-0"
 >
 	<!-- Header / Logo -->
 	<div class="mb-4 flex items-start justify-between">
@@ -70,16 +70,19 @@
 			{#if invoice.sender.taxId}<div class="pt-0.5">Steuernr.: {invoice.sender.taxId}</div>{/if}
 			<div class="pt-1"></div>
 			<div>
-				Datum: <strong>{formatDate(invoice.date, invoice.settings.locale)}</strong> • Nr.: <strong>{invoice.number}</strong>
+				Datum: <strong>{formatDate(invoice.date, invoice.settings.locale)}</strong> • Nr.:
+				<strong>{invoice.number}</strong>
 			</div>
-			<div>Leistung: <strong>{formatDate(invoice.serviceDate, invoice.settings.locale)}</strong></div>
+			<div>
+				Leistung: <strong>{formatDate(invoice.serviceDate, invoice.settings.locale)}</strong>
+			</div>
 		</div>
 	</div>
 
 	<!-- Title -->
 	<h1 class="mb-3 text-lg font-bold text-gray-900">Rechnung</h1>
 
-	<div class="flex-grow">
+	<div>
 		<!-- Message -->
 		{#if invoice.message}
 			<p class="mb-3 text-[10px] text-gray-700">{invoice.message}</p>
@@ -143,16 +146,18 @@
 						>{formatCurrency(subtotal, invoice.settings.currency, invoice.settings.locale)}</td
 					>
 				</tr>
-				<tr>
-					<td colspan="2" class="py-0.5 text-gray-700">Rabatt</td>
-					<td colspan="2" class="py-0.5 text-right text-green-700"
-						>-{formatCurrency(
-							discountTotal,
-							invoice.settings.currency,
-							invoice.settings.locale
-						)}</td
-					>
-				</tr>
+				{#if discountTotal > 0}
+					<tr>
+						<td colspan="2" class="py-0.5 text-gray-700">Rabatt</td>
+						<td colspan="2" class="py-0.5 text-right text-green-700"
+							>-{formatCurrency(
+								discountTotal,
+								invoice.settings.currency,
+								invoice.settings.locale
+							)}</td
+						>
+					</tr>
+				{/if}
 				<tr class="border-t border-gray-900">
 					<td colspan="2" class="py-1 text-gray-700">Netto</td>
 					<td colspan="2" class="py-1 text-right font-medium text-gray-900"
@@ -168,18 +173,14 @@
 				<tr class="font-bold">
 					<td colspan="2" class="py-1 text-gray-900">Brutto</td>
 					<td colspan="2" class="py-1 text-right text-sm text-gray-900"
-						>{formatCurrency(
-							grossTotal,
-							invoice.settings.currency,
-							invoice.settings.locale
-						)}</td
+						>{formatCurrency(grossTotal, invoice.settings.currency, invoice.settings.locale)}</td
 					>
 				</tr>
 			</tfoot>
 		</table>
 
 		<!-- Payment Info -->
-		<div class="mt-4 text-[10px] text-gray-700">
+		<div class="mt-4 text-[10px] text-gray-700 print:break-inside-avoid">
 			{#if invoice.settings.paymentText}
 				<p class="mb-2">{invoice.settings.paymentText}</p>
 			{/if}
@@ -199,16 +200,5 @@
 				</div>
 			{/if}
 		</div>
-	</div>
-
-	<!-- Footer - Positioned at absolute bottom -->
-	<div
-		class="border-t border-gray-200 pt-2 text-center text-[9px] text-gray-500"
-	>
-		{invoice.sender.company || invoice.sender.name}
-		{#if invoice.sender.email}
-			• {invoice.sender.email}{/if}
-		{#if invoice.sender.website}
-			• {invoice.sender.website}{/if}
 	</div>
 </div>
