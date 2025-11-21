@@ -5,6 +5,7 @@
 	import * as Button from '$lib/components/ui/button';
 	import * as Card from '$lib/components/ui/card';
 	import type { Discount } from '$lib/types';
+	import { t } from 'svelte-i18n';
 
 	export let discount: Discount;
 	export let removeDiscount: (id: string) => void;
@@ -19,7 +20,7 @@
 
 <Card.Root>
 	<Card.Header class="flex flex-row items-center justify-between space-y-0 p-4">
-		<Card.Title class="text-md font-semibold">Rabatt {index + 1}</Card.Title>
+		<Card.Title class="text-md font-semibold">{$t('form.discount')} {index + 1}</Card.Title>
 		<Button.Root onclick={() => removeDiscount(discount.id)} variant="destructive" size="icon">
 			<Trash2 size={16} />
 		</Button.Root>
@@ -28,13 +29,13 @@
 		<div class="grid grid-cols-1 gap-4 md:grid-cols-2">
 			<div class="space-y-2">
 				<Label.Root for="discount-description-{discount.id}" class="text-sm font-medium"
-					>Beschreibung</Label.Root
+					>{$t('form.description')}</Label.Root
 				>
 				<Input.Root
 					type="text"
 					id="discount-description-{discount.id}"
 					bind:value={discount.description}
-					placeholder="Beschreibung"
+					placeholder={$t('form.description')}
 					class={getDiscountError('description') ? 'border-destructive' : ''}
 				/>
 				{#if getDiscountError('description')}
@@ -45,13 +46,13 @@
 			</div>
 			<div class="space-y-2">
 				<Label.Root for="discount-amount-{discount.id}" class="text-sm font-medium"
-					>Betrag</Label.Root
+					>{$t('form.amount')}</Label.Root
 				>
 				<Input.Root
 					type="number"
 					id="discount-amount-{discount.id}"
 					bind:value={discount.amount}
-					placeholder="Betrag"
+					placeholder={$t('form.amount')}
 					class={getDiscountError('amount') ? 'border-destructive' : ''}
 				/>
 				{#if getDiscountError('amount')}

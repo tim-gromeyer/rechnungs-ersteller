@@ -2,8 +2,11 @@
 	import { toggleMode } from 'mode-watcher';
 	import { cn } from '$lib/utils/cn';
 	import { Moon, Sun, FileText } from 'lucide-svelte';
+	import { t } from 'svelte-i18n';
 
 	import type { Snippet } from 'svelte';
+	import LanguageSwitcher from './LanguageSwitcher.svelte';
+
 	let { children }: { children?: Snippet } = $props();
 	let isDarkMode = $state(false);
 
@@ -34,9 +37,10 @@
 			href="/"
 			class="hover:text-primary flex items-center gap-2 text-xl font-semibold tracking-tight transition-colors"
 		>
-			Rechnungs-Ersteller
+			{$t('meta.app_name')}
 		</a>
 		<div class="flex items-center gap-2">
+			<LanguageSwitcher />
 			<button
 				onclick={toggleMode}
 				class={cn(
@@ -53,12 +57,13 @@
 
 			<a
 				href="/dashboard"
+				data-sveltekit-preload-data="false"
 				class={cn(
 					'border-input bg-background hover:bg-accent hover:text-accent-foreground inline-flex h-10 items-center justify-center gap-2 rounded-lg border px-4 text-sm font-medium transition-all hover:scale-105 active:scale-95'
 				)}
 			>
 				<FileText size={18} />
-				<span class="hidden sm:inline">Übersicht</span>
+				<span class="hidden sm:inline">{$t('common.dashboard')}</span>
 			</a>
 
 			{@render children?.()}

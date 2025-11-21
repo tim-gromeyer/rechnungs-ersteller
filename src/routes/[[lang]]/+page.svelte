@@ -2,6 +2,7 @@
 	import Navbar from './components/Navbar.svelte';
 	import { Button } from '$lib/components/ui/button';
 	import { ArrowRight, CheckCircle2 } from 'lucide-svelte';
+	import { t } from 'svelte-i18n';
 </script>
 
 <svelte:head>
@@ -26,7 +27,7 @@
 		property="og:description"
 		content="Erstellen Sie professionelle, ZUGFeRD-konforme E-Rechnungen kostenlos direkt im Browser. Keine Anmeldung erforderlich. Ihre Daten bleiben lokal und sicher."
 	/>
-	<meta property="og:site_name" content="Rechnungs-Ersteller" />
+	<meta property="og:site_name" content={$t('meta.app_name')} />
 	<!-- <meta property="og:image" content="https://rechnungs-ersteller.com/og-image.jpg" /> -->
 
 	<!-- Twitter -->
@@ -71,23 +72,23 @@
 		<!-- Hero Section -->
 		<section class="container mx-auto px-4 py-24 text-center md:py-32">
 			<h1 class="mb-6 text-4xl font-extrabold tracking-tight sm:text-5xl md:text-6xl">
-				Rechnungen schreiben <br class="hidden sm:inline" />
-				<span class="text-primary">einfach gemacht</span>
+				{$t('landing.title')} <br class="hidden sm:inline" />
+				<span class="text-primary">{$t('landing.titleHighlight')}</span>
 			</h1>
 			<p class="text-muted-foreground mx-auto mb-10 max-w-[700px] text-lg md:text-xl">
-				Erstellen Sie professionelle, ZUGFeRD-konforme Rechnungen direkt in Ihrem Browser. Keine
-				Anmeldung, keine Kosten, Ihre Daten bleiben bei Ihnen.
+				{$t('landing.subtitle')}
 			</p>
 			<div class="flex flex-col items-center justify-center gap-4 sm:flex-row">
 				<Button size="lg" href="/dashboard" class="gap-2">
-					Zur Übersicht <ArrowRight size={18} />
+					{$t('common.dashboard')}
+					<ArrowRight size={18} />
 				</Button>
 				<Button
 					variant="outline"
 					size="lg"
 					href="https://github.com/tim-gromeyer/rechnungs-ersteller"
 				>
-					GitHub
+					{$t('common.github')}
 				</Button>
 			</div>
 		</section>
@@ -100,29 +101,27 @@
 						<div class="bg-primary/10 mb-6 flex h-16 w-16 items-center justify-center rounded-full">
 							<CheckCircle2 class="text-primary h-8 w-8" />
 						</div>
-						<h3 class="mb-3 text-xl font-bold">Lokal & Sicher</h3>
+						<h3 class="mb-3 text-xl font-bold">{$t('landing.features.localSecure.title')}</h3>
 						<p class="text-muted-foreground">
-							Alle Daten werden lokal in Ihrem Browser gespeichert. Nichts wird auf unsere Server
-							hochgeladen.
+							{$t('landing.features.localSecure.description')}
 						</p>
 					</div>
 					<div class="flex flex-col items-center text-center">
 						<div class="bg-primary/10 mb-6 flex h-16 w-16 items-center justify-center rounded-full">
 							<CheckCircle2 class="text-primary h-8 w-8" />
 						</div>
-						<h3 class="mb-3 text-xl font-bold">ZUGFeRD Konform</h3>
+						<h3 class="mb-3 text-xl font-bold">{$t('landing.features.zugferd.title')}</h3>
 						<p class="text-muted-foreground">
-							Erstellen Sie automatisch E-Rechnungen nach dem ZUGFeRD-Standard für maximale
-							Kompatibilität.
+							{$t('landing.features.zugferd.description')}
 						</p>
 					</div>
 					<div class="flex flex-col items-center text-center">
 						<div class="bg-primary/10 mb-6 flex h-16 w-16 items-center justify-center rounded-full">
 							<CheckCircle2 class="text-primary h-8 w-8" />
 						</div>
-						<h3 class="mb-3 text-xl font-bold">Kostenlos</h3>
+						<h3 class="mb-3 text-xl font-bold">{$t('landing.features.free.title')}</h3>
 						<p class="text-muted-foreground">
-							Unser Tool ist Open Source und komplett kostenlos nutzbar. Keine versteckten Gebühren.
+							{$t('landing.features.free.description')}
 						</p>
 					</div>
 				</div>
@@ -132,7 +131,7 @@
 
 	<footer class="border-t py-8">
 		<div class="text-muted-foreground container mx-auto px-4 text-center text-sm">
-			<p>&copy; {new Date().getFullYear()} Rechnungs-Ersteller. Open Source.</p>
+			<p>{$t('landing.footer', { values: { year: new Date().getFullYear() } })}</p>
 		</div>
 	</footer>
 </div>

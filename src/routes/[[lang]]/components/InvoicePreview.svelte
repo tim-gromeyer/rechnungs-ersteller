@@ -11,6 +11,7 @@
 		formatDate
 	} from '$lib/utils/calculations';
 	import * as Card from '$lib/components/ui/card';
+	import { t } from 'svelte-i18n';
 
 	// Create a reactive reference to the invoice
 	let invoice = $derived(invoiceState.invoice);
@@ -86,26 +87,27 @@
 				{#if invoice.sender.website}<div>{invoice.sender.website}</div>{/if}
 
 				{#if invoice.sender.taxId}
-					<div class="pt-0.5">Steuernr.: {invoice.sender.taxId}</div>
+					<div class="pt-0.5">{$t('invoice.taxId')} {invoice.sender.taxId}</div>
 				{/if}
 
 				<div class="pt-1"></div>
 
 				<div>
-					Datum: <strong>{formatDate(invoice.date, invoice.settings.locale)}</strong> • Nr.:
-
+					{$t('invoice.date')} <strong>{formatDate(invoice.date, invoice.settings.locale)}</strong>
+					• {$t('invoice.number')}
 					<strong>{invoice.number}</strong>
 				</div>
 
 				<div>
-					Leistung: <strong>{formatDate(invoice.serviceDate, invoice.settings.locale)}</strong>
+					{$t('invoice.serviceDate')}
+					<strong>{formatDate(invoice.serviceDate, invoice.settings.locale)}</strong>
 				</div>
 			</div>
 		</div>
 
 		<!-- Title -->
 
-		<h1 class="mb-3 text-lg font-bold text-gray-900">Rechnung</h1>
+		<h1 class="mb-3 text-lg font-bold text-gray-900">{$t('invoice.title')}</h1>
 
 		<div>
 			<!-- Message -->
@@ -119,13 +121,21 @@
 			<table class="mb-3 w-full border-collapse text-left text-[10px]">
 				<thead>
 					<tr class="border-b border-gray-900">
-						<th class="w-1/2 py-1 text-[10px] font-semibold text-gray-700">Bezeichnung</th>
+						<th class="w-1/2 py-1 text-[10px] font-semibold text-gray-700"
+							>{$t('invoice.description')}</th
+						>
 
-						<th class="py-1 text-right text-[10px] font-semibold text-gray-700">Preis</th>
+						<th class="py-1 text-right text-[10px] font-semibold text-gray-700"
+							>{$t('invoice.price')}</th
+						>
 
-						<th class="py-1 text-right text-[10px] font-semibold text-gray-700">Menge</th>
+						<th class="py-1 text-right text-[10px] font-semibold text-gray-700"
+							>{$t('invoice.quantity')}</th
+						>
 
-						<th class="py-1 text-right text-[10px] font-semibold text-gray-700">Betrag</th>
+						<th class="py-1 text-right text-[10px] font-semibold text-gray-700"
+							>{$t('invoice.amount')}</th
+						>
 					</tr>
 				</thead>
 
@@ -187,7 +197,7 @@
 
 				<tfoot>
 					<tr>
-						<td colspan="2" class="py-0.5 text-gray-700">Zwischensumme</td>
+						<td colspan="2" class="py-0.5 text-gray-700">{$t('invoice.subtotal')}</td>
 
 						<td colspan="2" class="py-0.5 text-right text-gray-700"
 							>{formatCurrency(subtotal, invoice.settings.currency, invoice.settings.locale)}</td
@@ -196,7 +206,7 @@
 
 					{#if discountTotal > 0}
 						<tr>
-							<td colspan="2" class="py-0.5 text-gray-700">Rabatt</td>
+							<td colspan="2" class="py-0.5 text-gray-700">{$t('invoice.discount')}</td>
 
 							<td colspan="2" class="py-0.5 text-right text-green-700"
 								>-{formatCurrency(
@@ -211,7 +221,7 @@
 					{/if}
 
 					<tr class="border-t border-gray-900">
-						<td colspan="2" class="py-1 text-gray-700">Netto</td>
+						<td colspan="2" class="py-1 text-gray-700">{$t('invoice.net')}</td>
 
 						<td colspan="2" class="py-1 text-right font-medium text-gray-900"
 							>{formatCurrency(netTotal, invoice.settings.currency, invoice.settings.locale)}</td
@@ -220,7 +230,7 @@
 
 					<tr>
 						<td colspan="2" class="py-0.5 text-gray-700">
-							zzgl. MwSt. {invoice.settings.vatRate}%</td
+							{$t('invoice.plusVat', { values: { rate: invoice.settings.vatRate } })}</td
 						>
 
 						<td colspan="2" class="py-0.5 text-right text-gray-700"
@@ -229,7 +239,7 @@
 					</tr>
 
 					<tr class="font-bold">
-						<td colspan="2" class="py-1 text-gray-900">Brutto</td>
+						<td colspan="2" class="py-1 text-gray-900">{$t('invoice.gross')}</td>
 
 						<td colspan="2" class="py-1 text-right text-sm text-gray-900"
 							>{formatCurrency(grossTotal, invoice.settings.currency, invoice.settings.locale)}</td
@@ -255,11 +265,14 @@
 
 				{#if invoice.sender.bankName || invoice.sender.iban}
 					<div class="mt-3 text-[9px] text-gray-600">
-						{#if invoice.sender.bankName}<div>Bank: {invoice.sender.bankName}</div>{/if}
+						{#if invoice.sender.bankName}<div>
+								{$t('invoice.bank')}
+								{invoice.sender.bankName}
+							</div>{/if}
 
-						{#if invoice.sender.iban}<div>IBAN: {invoice.sender.iban}</div>{/if}
+						{#if invoice.sender.iban}<div>{$t('invoice.iban')} {invoice.sender.iban}</div>{/if}
 
-						{#if invoice.sender.bic}<div>BIC: {invoice.sender.bic}</div>{/if}
+						{#if invoice.sender.bic}<div>{$t('invoice.bic')} {invoice.sender.bic}</div>{/if}
 					</div>
 				{/if}
 			</div>

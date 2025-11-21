@@ -9,12 +9,16 @@
 	import * as Card from '$lib/components/ui/card';
 	import ArticleCard from './ArticleCard.svelte';
 	import DiscountCard from './DiscountCard.svelte';
+	import { t, locale } from 'svelte-i18n';
 
 	// Don't destructure invoice - access it reactively through invoiceState
 	const { addArticle, removeArticle, addDiscount, removeDiscount } = invoiceState;
 
-	// Trigger validation whenever the invoice object changes
+	// Trigger validation whenever the invoice object or locale changes
 	$effect(() => {
+		// Track both invoice and locale changes
+		void invoiceState.invoice;
+		void $locale; // This makes the effect reactive to locale changes
 		invoiceState.validateInvoice();
 	});
 
@@ -79,7 +83,7 @@
 				<Accordion.Trigger
 					class="hover:bg-accent/50 flex w-full items-center justify-between px-6 py-4 text-left transition-all"
 				>
-					<h3 class="text-card-foreground text-lg font-semibold">Allgemein</h3>
+					<h3 class="text-card-foreground text-lg font-semibold">{$t('form.general')}</h3>
 					<ChevronDown
 						class="h-5 w-5 transition-transform duration-200 [[data-state=open]_&]:rotate-180"
 					/>
@@ -91,7 +95,7 @@
 				<div class="grid grid-cols-1 gap-4 px-6 pt-2 pb-6 md:grid-cols-2">
 					<div class="space-y-2">
 						<Label.Root for="input-invoice-number" class="text-foreground text-sm font-medium">
-							Rechnungsnummer (automatisch)
+							{$t('form.invoiceNumber')}
 						</Label.Root>
 						<Input.Root
 							type="text"
@@ -102,7 +106,7 @@
 					</div>
 					<div class="space-y-2">
 						<Label.Root for="input-invoice-date" class="text-foreground text-sm font-medium">
-							Datum
+							{$t('form.date')}
 						</Label.Root>
 						<Input.Root
 							type="date"
@@ -112,7 +116,7 @@
 					</div>
 					<div class="space-y-2">
 						<Label.Root for="input-service-date" class="text-foreground text-sm font-medium">
-							Leistungsdatum
+							{$t('form.serviceDate')}
 						</Label.Root>
 						<Input.Root
 							type="text"
@@ -123,7 +127,7 @@
 					</div>
 					<div class="space-y-2">
 						<Label.Root for="input-payment-days" class="text-foreground text-sm font-medium">
-							Zahlungsziel (Tage)
+							{$t('form.paymentTerms')}
 						</Label.Root>
 						<Input.Root
 							type="number"
@@ -139,7 +143,7 @@
 					</div>
 					<div class="space-y-2">
 						<Label.Root for="input-vat-rate" class="text-foreground text-sm font-medium">
-							MwSt. Satz (%)
+							{$t('form.vatRate')}
 						</Label.Root>
 						<Input.Root
 							type="number"
@@ -155,7 +159,7 @@
 					</div>
 					<div class="space-y-2">
 						<Label.Root for="input-currency" class="text-foreground text-sm font-medium">
-							Währung
+							{$t('form.currency')}
 						</Label.Root>
 						<Input.Root
 							type="text"
@@ -167,7 +171,7 @@
 					<!-- Logo Upload -->
 					<div class="space-y-2 md:col-span-2">
 						<Label.Root for="input-logo" class="text-foreground text-sm font-medium"
-							>Logo</Label.Root
+							>{$t('form.logo')}</Label.Root
 						>
 
 						{#if invoiceState.invoice.settings.logoPath}
@@ -178,7 +182,8 @@
 									class="border-border h-16 w-auto rounded border object-contain p-2"
 								/>
 								<Button.Root onclick={removeLogo} variant="destructive" size="sm">
-									<X size={16} /> Entfernen
+									<X size={16} />
+									{$t('form.remove')}
 								</Button.Root>
 							</div>
 						{:else}
@@ -193,7 +198,7 @@
 					<!-- Customizable Texts -->
 					<div class="space-y-2 md:col-span-2">
 						<Label.Root for="input-payment-text" class="text-foreground text-sm font-medium">
-							Zahlungstext
+							{$t('form.paymentText')}
 						</Label.Root>
 						<Textarea.Root
 							id="input-payment-text"
@@ -203,7 +208,7 @@
 					</div>
 					<div class="space-y-2 md:col-span-2">
 						<Label.Root for="input-tax-note" class="text-foreground text-sm font-medium">
-							Steuerhinweis (nur bei 0% MwSt.)
+							{$t('form.taxNote')}
 						</Label.Root>
 						<Input.Root
 							type="text"
@@ -225,7 +230,7 @@
 				<Accordion.Trigger
 					class="hover:bg-accent/50 flex w-full items-center justify-between px-6 py-4 text-left transition-all"
 				>
-					<h3 class="text-card-foreground text-lg font-semibold">Empfänger (Kunde)</h3>
+					<h3 class="text-card-foreground text-lg font-semibold">{$t('form.recipient')}</h3>
 					<ChevronDown
 						class="h-5 w-5 transition-transform duration-200 [[data-state=open]_&]:rotate-180"
 					/>
@@ -237,7 +242,7 @@
 				<div class="grid grid-cols-1 gap-4 px-6 pt-2 pb-6 md:grid-cols-2">
 					<div class="space-y-2">
 						<Label.Root for="input-customer-company" class="text-foreground text-sm font-medium">
-							Firma
+							{$t('form.company')}
 						</Label.Root>
 						<Input.Root
 							type="text"
@@ -247,7 +252,7 @@
 					</div>
 					<div class="space-y-2">
 						<Label.Root for="input-customer-name" class="text-foreground text-sm font-medium">
-							Name
+							{$t('form.name')}
 						</Label.Root>
 						<Input.Root
 							type="text"
@@ -263,7 +268,7 @@
 					</div>
 					<div class="space-y-2 md:col-span-2">
 						<Label.Root for="input-customer-street" class="text-foreground text-sm font-medium">
-							Straße
+							{$t('form.street')}
 						</Label.Root>
 						<Input.Root
 							type="text"
@@ -279,7 +284,7 @@
 					</div>
 					<div class="space-y-2">
 						<Label.Root for="input-customer-zip" class="text-foreground text-sm font-medium">
-							PLZ
+							{$t('form.zip')}
 						</Label.Root>
 						<Input.Root
 							type="text"
@@ -295,7 +300,7 @@
 					</div>
 					<div class="space-y-2">
 						<Label.Root for="input-customer-city" class="text-foreground text-sm font-medium">
-							Stadt
+							{$t('form.city')}
 						</Label.Root>
 						<Input.Root
 							type="text"
@@ -322,7 +327,7 @@
 				<Accordion.Trigger
 					class="hover:bg-accent/50 flex w-full items-center justify-between px-6 py-4 text-left transition-all"
 				>
-					<h3 class="text-card-foreground text-lg font-semibold">Absender (Du)</h3>
+					<h3 class="text-card-foreground text-lg font-semibold">{$t('form.sender')}</h3>
 					<ChevronDown
 						class="h-5 w-5 transition-transform duration-200 [[data-state=open]_&]:rotate-180"
 					/>
@@ -334,7 +339,7 @@
 				<div class="grid grid-cols-1 gap-4 px-6 pt-2 pb-6 md:grid-cols-2">
 					<div class="space-y-2">
 						<Label.Root for="input-sender-company" class="text-foreground text-sm font-medium">
-							Firma
+							{$t('form.company')}
 						</Label.Root>
 						<Input.Root
 							type="text"
@@ -344,7 +349,7 @@
 					</div>
 					<div class="space-y-2">
 						<Label.Root for="input-sender-name" class="text-foreground text-sm font-medium">
-							Name
+							{$t('form.name')}
 						</Label.Root>
 						<Input.Root
 							type="text"
@@ -360,7 +365,7 @@
 					</div>
 					<div class="space-y-2 md:col-span-2">
 						<Label.Root for="input-sender-street" class="text-foreground text-sm font-medium">
-							Straße
+							{$t('form.street')}
 						</Label.Root>
 						<Input.Root
 							type="text"
@@ -376,7 +381,7 @@
 					</div>
 					<div class="space-y-2">
 						<Label.Root for="input-sender-zip" class="text-foreground text-sm font-medium">
-							PLZ
+							{$t('form.zip')}
 						</Label.Root>
 						<Input.Root
 							type="text"
@@ -392,7 +397,7 @@
 					</div>
 					<div class="space-y-2">
 						<Label.Root for="input-sender-city" class="text-foreground text-sm font-medium">
-							Stadt
+							{$t('form.city')}
 						</Label.Root>
 						<Input.Root
 							type="text"
@@ -409,12 +414,12 @@
 
 					<div class="md:col-span-2">
 						<div class="bg-border my-4 h-px"></div>
-						<h4 class="text-foreground mb-4 text-sm font-semibold">Kontakt</h4>
+						<h4 class="text-foreground mb-4 text-sm font-semibold">{$t('form.contact')}</h4>
 					</div>
 
 					<div class="space-y-2">
 						<Label.Root for="input-sender-email" class="text-foreground text-sm font-medium">
-							Email
+							{$t('form.email')}
 						</Label.Root>
 						<Input.Root
 							type="text"
@@ -430,7 +435,7 @@
 					</div>
 					<div class="space-y-2">
 						<Label.Root for="input-sender-website" class="text-foreground text-sm font-medium">
-							Webseite
+							{$t('form.website')}
 						</Label.Root>
 						<Input.Root
 							type="text"
@@ -447,12 +452,12 @@
 
 					<div class="md:col-span-2">
 						<div class="bg-border my-4 h-px"></div>
-						<h4 class="text-foreground mb-4 text-sm font-semibold">Bank & Steuer</h4>
+						<h4 class="text-foreground mb-4 text-sm font-semibold">{$t('form.bankTax')}</h4>
 					</div>
 
 					<div class="space-y-2">
 						<Label.Root for="input-sender-bank-name" class="text-foreground text-sm font-medium">
-							Bank Name
+							{$t('form.bankName')}
 						</Label.Root>
 						<Input.Root
 							type="text"
@@ -462,7 +467,7 @@
 					</div>
 					<div class="space-y-2">
 						<Label.Root for="input-sender-iban" class="text-foreground text-sm font-medium">
-							IBAN
+							{$t('form.iban')}
 						</Label.Root>
 						<Input.Root
 							type="text"
@@ -478,7 +483,7 @@
 					</div>
 					<div class="space-y-2">
 						<Label.Root for="input-sender-bic" class="text-foreground text-sm font-medium">
-							BIC
+							{$t('form.bic')}
 						</Label.Root>
 						<Input.Root
 							type="text"
@@ -494,7 +499,7 @@
 					</div>
 					<div class="space-y-2">
 						<Label.Root for="input-sender-tax-id" class="text-foreground text-sm font-medium">
-							Steuernummer
+							{$t('form.taxId')}
 						</Label.Root>
 						<Input.Root
 							type="text"
@@ -510,7 +515,7 @@
 					</div>
 					<div class="space-y-2">
 						<Label.Root for="input-sender-vat-id" class="text-foreground text-sm font-medium">
-							USt-IdNr.
+							{$t('form.vatId')}
 						</Label.Root>
 						<Input.Root
 							type="text"
@@ -532,9 +537,10 @@
 	<!-- Articles -->
 	<Card.Root>
 		<Card.Header class="flex flex-row items-center justify-between space-y-0 p-4">
-			<Card.Title class="text-lg font-semibold">Positionen</Card.Title>
+			<Card.Title class="text-lg font-semibold">{$t('form.items')}</Card.Title>
 			<Button.Root onclick={addArticle} size="sm">
-				<Plus size={16} /> Artikel
+				<Plus size={16} />
+				{$t('form.article')}
 			</Button.Root>
 		</Card.Header>
 		<Card.Content class="space-y-4 p-4 pt-0">
@@ -547,9 +553,10 @@
 	<!-- Discounts -->
 	<Card.Root>
 		<Card.Header class="flex flex-row items-center justify-between space-y-0 p-4">
-			<Card.Title class="text-lg font-semibold">Rabatte</Card.Title>
+			<Card.Title class="text-lg font-semibold">{$t('form.discounts')}</Card.Title>
 			<Button.Root onclick={addDiscount} variant="outline" size="sm">
-				<Plus size={16} /> Rabatt
+				<Plus size={16} />
+				{$t('form.discount')}
 			</Button.Root>
 		</Card.Header>
 		<Card.Content class="space-y-4 p-4 pt-0">

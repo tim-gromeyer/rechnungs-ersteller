@@ -1,0 +1,106 @@
+{
+	"common": {
+		"save": "Speichern",
+		"cancel": "Abbrechen",
+		"delete": "Löschen",
+		"edit": "Bearbeiten",
+		"dashboard": "Übersicht",
+		"github": "GitHub"
+	},
+	"landing": {
+		"title": "Rechnungen schreiben",
+		"titleHighlight": "einfach gemacht",
+		"subtitle": "Erstellen Sie professionelle, ZUGFeRD-konforme Rechnungen direkt in Ihrem Browser. Keine Anmeldung, keine Kosten, Ihre Daten bleiben bei Ihnen.",
+		"features": {
+			"localSecure": {
+				"title": "Lokal & Sicher",
+				"description": "Alle Daten werden lokal in Ihrem Browser gespeichert. Nichts wird auf unsere Server hochgeladen."
+			},
+			"zugferd": {
+				"title": "ZUGFeRD Konform",
+				"description": "Erstellen Sie automatisch E-Rechnungen nach dem ZUGFeRD-Standard für maximale Kompatibilität."
+			},
+			"free": {
+				"title": "Kostenlos",
+				"description": "Unser Tool ist Open Source und komplett kostenlos nutzbar. Keine versteckten Gebühren."
+			}
+		},
+		"footer": "© {year} Rechnungs-Ersteller. Open Source."
+	},
+	"form": {
+		"general": "Allgemein",
+		"invoiceNumber": "Rechnungsnummer (automatisch)",
+		"date": "Datum",
+		"serviceDate": "Leistungsdatum",
+		"paymentTerms": "Zahlungsziel (Tage)",
+		"vatRate": "MwSt. Satz (%)",
+		"currency": "Währung",
+		"logo": "Logo",
+		"remove": "Entfernen",
+		"paymentText": "Zahlungstext",
+		"taxNote": "Steuerhinweis (nur bei 0% MwSt.)",
+		"recipient": "Empfänger (Kunde)",
+		"company": "Firma",
+		"name": "Name",
+		"street": "Straße",
+		"zip": "PLZ",
+		"city": "Stadt",
+		"sender": "Absender (Du)",
+		"contact": "Kontakt",
+		"email": "Email",
+		"website": "Webseite",
+		"bankTax": "Bank & Steuer",
+		"bankName": "Bank Name",
+		"iban": "IBAN",
+		"bic": "BIC",
+		"taxId": "Steuernummer",
+		"vatId": "USt-IdNr.",
+		"items": "Positionen",
+		"article": "Artikel",
+		"discounts": "Rabatte",
+		"discount": "Rabatt",
+		"description": "Beschreibung",
+		"details": "Details (optional)",
+		"amount": "Menge",
+		"price": "Preis",
+		"position": "Position"
+	},
+	"meta": {
+		"app_name": "Rechnungs-Ersteller"
+	},
+	"validation": {
+		"nameRequired": "Name ist erforderlich",
+		"streetRequired": "Straße ist erforderlich",
+		"zipRequired": "Postleitzahl ist erforderlich",
+		"cityRequired": "Ort ist erforderlich",
+		"invalidEmail": "Ungültige E-Mail-Adresse",
+		"invalidPhone": "Ungültige Telefonnummer",
+		"invalidUrl": "Ungültige URL",
+		"invalidIban": "Ungültiges IBAN-Format",
+		"invalidBic": "Ungültiges BIC-Format",
+		"localeRequired": "Sprachcode ist erforderlich",
+		"vatRateNonNegative": "Mehrwertsteuersatz darf nicht negativ sein",
+		"currencyRequired": "Währung ist erforderlich",
+		"paymentDaysNonNegative": "Zahlungsziel muss eine nicht-negative ganze Zahl sein",
+		"invoiceNumberFormatRequired": "Rechnungsnummernformat ist erforderlich",
+		"articleDescriptionRequired": "Artikelbeschreibung ist erforderlich",
+		"priceNonNegative": "Preis pro Einheit darf nicht negativ sein",
+		"amountMinOne": "Menge muss mindestens 1 sein",
+		"discountDescriptionRequired": "Rabattbeschreibung ist erforderlich",
+		"discountAmountNonNegative": "Rabattbetrag darf nicht negativ sein",
+		"invoiceNumberRequired": "Rechnungsnummer ist erforderlich",
+		"dateRequired": "Datum ist erforderlich",
+		"serviceDateRequired": "Leistungsdatum ist erforderlich",
+		"paymentDateRequired": "Fälligkeitsdatum ist erforderlich"
+	},
+	"dashboard": {
+		"title": "Rechnungsübersicht",
+		"newInvoice": "Neue Rechnung",
+		"noInvoicesFound": "Keine Rechnungen gefunden.",
+		"createFirstInvoice": "Erstellen Sie Ihre erste Rechnung",
+		"draft": "Entwurf",
+		"unknownCustomer": "Unbekannter Kunde",
+		"deleteInvoice": "Rechnung löschen",
+		"confirmDeleteDescription": "Möchten Sie diese Rechnung wirklich unwiderruflich löschen?"
+	}
+}

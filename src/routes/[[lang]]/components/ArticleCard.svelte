@@ -6,6 +6,7 @@
 	import * as Button from '$lib/components/ui/button';
 	import * as Card from '$lib/components/ui/card';
 	import type { Article } from '$lib/types';
+	import { t } from 'svelte-i18n';
 
 	export let article: Article;
 	export let removeArticle: (id: string) => void;
@@ -20,7 +21,7 @@
 
 <Card.Root>
 	<Card.Header class="flex flex-row items-center justify-between space-y-0 p-4">
-		<Card.Title class="text-md font-semibold">Position {index + 1}</Card.Title>
+		<Card.Title class="text-md font-semibold">{$t('form.position')} {index + 1}</Card.Title>
 		<Button.Root onclick={() => removeArticle(article.id)} variant="destructive" size="icon">
 			<Trash2 size={16} />
 		</Button.Root>
@@ -29,13 +30,13 @@
 		<div class="grid grid-cols-1 gap-4 md:grid-cols-2">
 			<div class="space-y-2">
 				<Label.Root for="article-description-{article.id}" class="text-sm font-medium"
-					>Beschreibung</Label.Root
+					>{$t('form.description')}</Label.Root
 				>
 				<Input.Root
 					type="text"
 					id="article-description-{article.id}"
 					bind:value={article.description}
-					placeholder="Beschreibung"
+					placeholder={$t('form.description')}
 					class={getArticleError('description') ? 'border-destructive' : ''}
 				/>
 				{#if getArticleError('description')}
@@ -46,12 +47,12 @@
 			</div>
 			<div class="space-y-2">
 				<Label.Root for="article-summary-{article.id}" class="text-sm font-medium"
-					>Details (optional)</Label.Root
+					>{$t('form.details')}</Label.Root
 				>
 				<Textarea.Root
 					id="article-summary-{article.id}"
 					bind:value={article.summary}
-					placeholder="Details (optional)"
+					placeholder={$t('form.details')}
 					class={getArticleError('summary') ? 'border-destructive' : ''}
 				/>
 				{#if getArticleError('summary')}
@@ -61,12 +62,14 @@
 				{/if}
 			</div>
 			<div class="space-y-2">
-				<Label.Root for="article-amount-{article.id}" class="text-sm font-medium">Menge</Label.Root>
+				<Label.Root for="article-amount-{article.id}" class="text-sm font-medium"
+					>{$t('form.amount')}</Label.Root
+				>
 				<Input.Root
 					type="number"
 					id="article-amount-{article.id}"
 					bind:value={article.amount}
-					placeholder="Menge"
+					placeholder={$t('form.amount')}
 					class={getArticleError('amount') ? 'border-destructive' : ''}
 				/>
 				{#if getArticleError('amount')}
@@ -76,12 +79,14 @@
 				{/if}
 			</div>
 			<div class="space-y-2">
-				<Label.Root for="article-price-{article.id}" class="text-sm font-medium">Preis</Label.Root>
+				<Label.Root for="article-price-{article.id}" class="text-sm font-medium"
+					>{$t('form.price')}</Label.Root
+				>
 				<Input.Root
 					type="number"
 					id="article-price-{article.id}"
 					bind:value={article.pricePerUnit}
-					placeholder="Preis"
+					placeholder={$t('form.price')}
 					class={getArticleError('pricePerUnit') ? 'border-destructive' : ''}
 				/>
 				{#if getArticleError('pricePerUnit')}

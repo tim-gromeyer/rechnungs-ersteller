@@ -1,8 +1,10 @@
 import type { Invoice } from './types';
 import { generateInvoiceNumber } from './utils/invoice-number';
 import { browser } from '$app/environment';
-import { invoiceSchema } from './validation'; // Import the Zod schema
+import { createInvoiceSchema } from './validation'; // Import the factory function
 import { z } from 'zod'; // Import z from zod
+import { _ } from 'svelte-i18n'; // Import translation store
+import { get } from 'svelte/store'; // Import get to read store value
 
 // Type for storing validation errors
 type InvoiceValidationErrors = z.ZodFormattedError<Invoice> | null;
@@ -48,7 +50,7 @@ function getDefaultInvoice(): Invoice {
 		],
 		discounts: [],
 		settings: {
-			locale: 'de-DE',
+			locale: 'de',
 			vatRate: 0,
 			currency: 'EUR',
 			paymentDays: 14,
@@ -67,6 +69,12 @@ function createInvoiceState() {
 
 	// Function to validate the current invoice state
 	function validateInvoice() {
+		// Get the current translation function
+		const t = get(_);
+
+		// Create schema with current locale's translations
+		const { invoiceSchema } = createInvoiceSchema((key: string) => t(key) as string);
+
 		const result = invoiceSchema.safeParse(invoice);
 		if (!result.success) {
 			validationErrors = result.error.format();
@@ -93,6 +101,10 @@ function createInvoiceState() {
 		},
 
 		validateInvoice, // Expose the validation function
+
+		updateLocale: (newLocale: string) => {
+			invoice.settings.locale = newLocale;
+		},
 
 		addArticle: () => {
 			invoice.articles.push({

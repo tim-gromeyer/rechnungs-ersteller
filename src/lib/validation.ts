@@ -4,75 +4,93 @@ import { z } from 'zod';
 // that can validate based on country codes.
 const ibanRegex = /^[A-Z]{2}[0-9]{2}(?:[ ]?[0-9]{4}){4}(?:[ ]?[0-9]{1,2})?$/;
 const bicRegex = /^[A-Z]{6}[A-Z0-9]{2}([A-Z0-9]{3})?$/;
-const phoneRegex = /^[+]?[(]?[0-9]{3}[)]?[-\s.]?[0-9]{3}[-\s.]?[0-9]{4,6}$/; // Basic phone number regex
+const phoneRegex = /^[+]?[(]?[0-9]{3}[)]?[-\\s.]?[0-9]{3}[-\\s.]?[0-9]{4,6}$/; // Basic phone number regex
 
-export const addressSchema = z.object({
-	company: z.string().optional(),
-	name: z.string().min(1, 'Name ist erforderlich'),
-	street: z.string().min(1, 'Straße ist erforderlich'),
-	zip: z.string().min(1, 'Postleitzahl ist erforderlich'),
-	city: z.string().min(1, 'Ort ist erforderlich'),
-	country: z.string().optional()
-});
+// Type for translation function
+type TranslateFn = (key: string) => string;
 
-export const contactInfoSchema = z.object({
-	email: z.string().email('Ungültige E-Mail-Adresse').optional().or(z.literal('')),
-	phone: z.string().regex(phoneRegex, 'Ungültige Telefonnummer').optional().or(z.literal('')),
-	website: z.string().url('Ungültige URL').optional().or(z.literal(''))
-});
+// Factory function to create schemas with localized error messages
+export function createInvoiceSchema(t: TranslateFn) {
+	const addressSchema = z.object({
+		company: z.string().optional(),
+		name: z.string().min(1, t('validation.nameRequired')),
+		street: z.string().min(1, t('validation.streetRequired')),
+		zip: z.string().min(1, t('validation.zipRequired')),
+		city: z.string().min(1, t('validation.cityRequired')),
+		country: z.string().optional()
+	});
 
-export const bankDetailsSchema = z.object({
-	bankName: z.string().optional(),
-	iban: z.string().regex(ibanRegex, 'Ungültiges IBAN-Format').optional().or(z.literal('')),
-	bic: z.string().regex(bicRegex, 'Ungültiges BIC-Format').optional().or(z.literal('')),
-	taxId: z.string().optional(),
-	vatId: z.string().optional()
-});
+	const contactInfoSchema = z.object({
+		email: z.string().email(t('validation.invalidEmail')).optional().or(z.literal('')),
+		phone: z.string().regex(phoneRegex, t('validation.invalidPhone')).optional().or(z.literal('')),
+		website: z.string().url(t('validation.invalidUrl')).optional().or(z.literal(''))
+	});
 
-export const senderSchema = addressSchema.merge(contactInfoSchema).merge(bankDetailsSchema);
+	const bankDetailsSchema = z.object({
+		bankName: z.string().optional(),
+		iban: z.string().regex(ibanRegex, t('validation.invalidIban')).optional().or(z.literal('')),
+		bic: z.string().regex(bicRegex, t('validation.invalidBic')).optional().or(z.literal('')),
+		taxId: z.string().optional(),
+		vatId: z.string().optional()
+	});
 
-export const invoiceSettingsSchema = z.object({
-	locale: z.string().min(1, 'Sprachcode ist erforderlich'),
-	vatRate: z.number().min(0, 'Mehrwertsteuersatz darf nicht negativ sein'),
-	currency: z.string().min(1, 'Währung ist erforderlich'),
-	paymentDays: z.number().int().min(0, 'Zahlungsziel muss eine nicht-negative ganze Zahl sein'),
-	invoiceNumberFormat: z.string().min(1, 'Rechnungsnummernformat ist erforderlich'),
-	logoPath: z.string().optional(),
-	paymentText: z.string().optional(),
-	taxNote: z.string().optional()
-});
+	const senderSchema = addressSchema.merge(contactInfoSchema).merge(bankDetailsSchema);
 
-export const articleSchema = z.object({
-	id: z.string(),
-	description: z.string().min(1, 'Artikelbeschreibung ist erforderlich'),
-	pricePerUnit: z.number().min(0, 'Preis pro Einheit darf nicht negativ sein'),
-	amount: z.number().min(1, 'Menge muss mindestens 1 sein'),
-	summary: z.string().optional()
-});
+	const invoiceSettingsSchema = z.object({
+		locale: z.string().min(1, t('validation.localeRequired')),
+		vatRate: z.number().min(0, t('validation.vatRateNonNegative')),
+		currency: z.string().min(1, t('validation.currencyRequired')),
+		paymentDays: z.number().int().min(0, t('validation.paymentDaysNonNegative')),
+		invoiceNumberFormat: z.string().min(1, t('validation.invoiceNumberFormatRequired')),
+		logoPath: z.string().optional(),
+		paymentText: z.string().optional(),
+		taxNote: z.string().optional()
+	});
 
-export const discountSchema = z.object({
-	id: z.string(),
-	description: z.string().min(1, 'Rabattbeschreibung ist erforderlich'),
-	amount: z.number().min(0, 'Rabattbetrag darf nicht negativ sein')
-});
+	const articleSchema = z.object({
+		id: z.string(),
+		description: z.string().min(1, t('validation.articleDescriptionRequired')),
+		pricePerUnit: z.number().min(0, t('validation.priceNonNegative')),
+		amount: z.number().min(1, t('validation.amountMinOne')),
+		summary: z.string().optional()
+	});
 
-export const invoiceSchema = z.object({
-	number: z.string().min(1, 'Rechnungsnummer ist erforderlich'),
-	date: z.string().min(1, 'Datum ist erforderlich'),
-	serviceDate: z.string().min(1, 'Leistungsdatum ist erforderlich'),
-	paymentDate: z.string().min(1, 'Fälligkeitsdatum ist erforderlich'),
+	const discountSchema = z.object({
+		id: z.string(),
+		description: z.string().min(1, t('validation.discountDescriptionRequired')),
+		amount: z.number().min(0, t('validation.discountAmountNonNegative'))
+	});
 
-	sender: senderSchema,
-	customer: addressSchema,
+	const invoiceSchema = z.object({
+		number: z.string().min(1, t('validation.invoiceNumberRequired')),
+		date: z.string().min(1, t('validation.dateRequired')),
+		serviceDate: z.string().min(1, t('validation.serviceDateRequired')),
+		paymentDate: z.string().min(1, t('validation.paymentDateRequired')),
 
-	articles: z.array(articleSchema),
-	discounts: z.array(discountSchema),
+		sender: senderSchema,
+		customer: addressSchema,
 
-	settings: invoiceSettingsSchema,
+		articles: z.array(articleSchema),
+		discounts: z.array(discountSchema),
 
-	message: z.string().optional()
-});
+		settings: invoiceSettingsSchema,
 
-export type InvoiceValidation = z.infer<typeof invoiceSchema>;
-export type SenderValidation = z.infer<typeof senderSchema>;
-export type CustomerValidation = z.infer<typeof addressSchema>;
+		message: z.string().optional()
+	});
+
+	return {
+		invoiceSchema,
+		addressSchema,
+		senderSchema,
+		contactInfoSchema,
+		bankDetailsSchema,
+		invoiceSettingsSchema,
+		articleSchema,
+		discountSchema
+	};
+}
+
+// Type exports (using a dummy schema for type inference)
+export type InvoiceValidation = z.infer<ReturnType<typeof createInvoiceSchema>['invoiceSchema']>;
+export type SenderValidation = z.infer<ReturnType<typeof createInvoiceSchema>['senderSchema']>;
+export type CustomerValidation = z.infer<ReturnType<typeof createInvoiceSchema>['addressSchema']>;

@@ -8,6 +8,7 @@
 	import { ArrowLeft, Trash2, Edit } from 'lucide-svelte';
 	import ConfirmDialog from '../components/ConfirmDialog.svelte';
 	import { invoiceState } from '$lib/state.svelte';
+	import { _ } from 'svelte-i18n';
 
 	let invoices = $state<Invoice[]>([]);
 	let deleteDialogOpen = $state(false);
@@ -90,17 +91,18 @@
 			<Button variant="ghost" size="icon" href="/">
 				<ArrowLeft size={24} />
 			</Button>
-			<h1 class="text-3xl font-bold">Rechnungsübersicht</h1>
+			<h1 class="text-3xl font-bold">{$_('dashboard.title')}</h1>
 		</div>
-		<Button onclick={handleCreateNew} variant="default">Neue Rechnung</Button>
+		<Button onclick={handleCreateNew} variant="default">{$_('dashboard.newInvoice')}</Button>
 	</div>
 
 	<div class="grid gap-4">
 		{#if invoices.length === 0}
 			<Card>
 				<CardContent class="text-muted-foreground flex flex-col items-center justify-center py-12">
-					<p>Keine Rechnungen gefunden.</p>
-					<Button variant="link" onclick={handleCreateNew}>Erstellen Sie Ihre erste Rechnung</Button
+					<p>{$_('dashboard.noInvoicesFound')}</p>
+					<Button variant="link" onclick={handleCreateNew}
+						>{$_('dashboard.createFirstInvoice')}</Button
 					>
 				</CardContent>
 			</Card>
@@ -110,13 +112,15 @@
 					<CardContent class="flex items-center justify-between p-6">
 						<div class="grid gap-1">
 							<div class="font-semibold">
-								{invoice.number || 'Entwurf'}
+								{invoice.number || $_('dashboard.draft')}
 								<span class="text-muted-foreground ml-2 font-normal">
 									{new Date(invoice.date).toLocaleDateString('de-DE')}
 								</span>
 							</div>
 							<div class="text-muted-foreground text-sm">
-								{invoice.customer.company || invoice.customer.name || 'Unbekannter Kunde'}
+								{invoice.customer.company ||
+									invoice.customer.name ||
+									$_('dashboard.unknownCustomer')}
 							</div>
 						</div>
 
@@ -147,8 +151,8 @@
 
 <ConfirmDialog
 	bind:open={deleteDialogOpen}
-	title="Rechnung löschen"
-	description="Sind Sie sicher, dass Sie diese Rechnung unwiderruflich löschen möchten?"
+	title={$_('dashboard.deleteInvoice')}
+	description={$_('dashboard.confirmDeleteDescription')}
 	onConfirm={handleDelete}
 	onCancel={() => (deleteDialogOpen = false)}
 />
