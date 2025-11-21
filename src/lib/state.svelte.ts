@@ -8,39 +8,14 @@ import { z } from 'zod'; // Import z from zod
 type InvoiceValidationErrors = z.ZodFormattedError<Invoice> | null;
 
 function loadInvoice(): Invoice {
-	const defaultInvoice = getDefaultInvoice();
-	if (!browser) {
-		return defaultInvoice;
-	}
-
-	const stored = localStorage.getItem('invoice-state');
-	if (stored) {
-		try {
-			const parsed = JSON.parse(stored);
-			if (parsed && typeof parsed === 'object' && 'articles' in parsed) {
-				const merged: Invoice = {
-					...defaultInvoice,
-					...parsed,
-					sender: {
-						...defaultInvoice.sender,
-						...parsed.sender
-					},
-					settings: {
-						...defaultInvoice.settings,
-						...parsed.settings
-					}
-				};
-				return merged;
-			}
-		} catch {
-			// Fallback to default if parsing fails
-		}
-	}
-	return defaultInvoice;
+	// Always return default invoice initially.
+	// Persistence layer will update this asynchronously.
+	return getDefaultInvoice();
 }
 
 function getDefaultInvoice(): Invoice {
 	return {
+		id: crypto.randomUUID(),
 		number: browser ? generateInvoiceNumber() : '2025-01-1',
 		date: new Date().toISOString().split('T')[0],
 		serviceDate: 'today',
@@ -152,6 +127,7 @@ function createInvoiceState() {
 
 			// Reset invoice with new number and date
 			const newInvoice: Invoice = {
+				id: crypto.randomUUID(),
 				number: newNumber,
 				date: new Date().toISOString().split('T')[0],
 				serviceDate: 'today',

@@ -52,6 +52,7 @@ export interface InvoiceSettings {
 }
 
 export interface Invoice {
+	id: string;
 	number: string;
 	date: string; // ISO date string
 	serviceDate: string; // ISO date string or "today"
