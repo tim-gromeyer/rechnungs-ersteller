@@ -1,158 +1,138 @@
 <script lang="ts">
-	import { onMount } from 'svelte';
-	import InvoiceForm from './components/InvoiceForm.svelte';
-	import InvoicePreview from './components/InvoicePreview.svelte';
-	import StatePersistence from './components/StatePersistence.svelte';
-	import { invoiceState } from '$lib/state.svelte';
-	import { generateZugferdXml } from '$lib/utils/zugferd';
-	import { Printer, Download, Moon, Sun, FileText } from 'lucide-svelte';
-	import { toggleMode } from 'mode-watcher';
-	import { cn } from '$lib/utils/cn';
-
-	let isDarkMode = $state(false);
-
-	onMount(() => {
-		// Check if dark mode is active after mount
-		isDarkMode = document.documentElement.classList.contains('dark');
-
-		// Watch for class changes
-		const observer = new MutationObserver(() => {
-			isDarkMode = document.documentElement.classList.contains('dark');
-		});
-		observer.observe(document.documentElement, { attributes: true, attributeFilter: ['class'] });
-
-		return () => observer.disconnect();
-	});
-
-	function handlePrint() {
-		window.print();
-	}
-
-	function handleDownloadXml() {
-		const xml = generateZugferdXml(invoiceState.invoice);
-		const blob = new Blob([xml], { type: 'application/xml' });
-		const url = URL.createObjectURL(blob);
-		const a = document.createElement('a');
-		a.href = url;
-		a.download = `invoice-${invoiceState.invoice.number}.xml`;
-		document.body.appendChild(a);
-		a.click();
-		document.body.removeChild(a);
-		URL.revokeObjectURL(url);
-	}
-
-	function handleNewInvoice() {
-		if (
-			confirm(
-				'Neue Rechnung erstellen? Die aktuellen Kundendaten und Positionen werden zurückgesetzt.'
-			)
-		) {
-			invoiceState.createNewInvoice();
-		}
-	}
+	import Navbar from './components/Navbar.svelte';
+	import { Button } from '$lib/components/ui/button';
+	import { ArrowRight, CheckCircle2 } from 'lucide-svelte';
 </script>
 
-<StatePersistence>
-	<div
-		class="from-background via-background to-muted/20 flex min-h-screen flex-col bg-gradient-to-br"
-	>
-		<!-- Navbar -->
-		<nav
-			class="border-border/40 bg-background/80 supports-[backdrop-filter]:bg-background/60 sticky top-0 z-50 border-b backdrop-blur-xl print:hidden"
-		>
-			<div class="mx-auto flex h-16 max-w-[1800px] items-center justify-between px-4 md:px-8">
-				<!-- eslint-disable-next-line svelte/no-navigation-without-resolve -->
-				<!-- eslint-disable svelte/no-navigation-without-resolve -->
-				<a
-					href="/"
-					class="hover:text-primary flex items-center gap-2 text-xl font-semibold tracking-tight transition-colors"
+<svelte:head>
+	<title>Kostenlos Rechnung schreiben | ZUGFeRD E-Rechnung Generator</title>
+	<meta
+		name="description"
+		content="Erstellen Sie professionelle, ZUGFeRD-konforme E-Rechnungen kostenlos direkt im Browser. Keine Anmeldung erforderlich. Ihre Daten bleiben lokal und sicher."
+	/>
+	<meta
+		name="keywords"
+		content="Rechnung schreiben, Rechnung erstellen, E-Rechnung, ZUGFeRD, kostenlos, online, PDF Rechnung, Kleinunternehmer, Freiberufler"
+	/>
+	<meta name="robots" content="index, follow" />
+	<meta name="author" content="Tim Gromeyer" />
+	<link rel="canonical" href="https://rechnungs-ersteller.com/" />
+
+	<!-- Open Graph / Facebook -->
+	<meta property="og:type" content="website" />
+	<meta property="og:url" content="https://rechnungs-ersteller.com/" />
+	<meta property="og:title" content="Kostenlos Rechnung schreiben | ZUGFeRD E-Rechnung Generator" />
+	<meta
+		property="og:description"
+		content="Erstellen Sie professionelle, ZUGFeRD-konforme E-Rechnungen kostenlos direkt im Browser. Keine Anmeldung erforderlich. Ihre Daten bleiben lokal und sicher."
+	/>
+	<meta property="og:site_name" content="Rechnungs-Ersteller" />
+	<!-- <meta property="og:image" content="https://rechnungs-ersteller.com/og-image.jpg" /> -->
+
+	<!-- Twitter -->
+	<meta property="twitter:card" content="summary_large_image" />
+	<meta property="twitter:url" content="https://rechnungs-ersteller.com/" />
+	<meta
+		property="twitter:title"
+		content="Kostenlos Rechnung schreiben | ZUGFeRD E-Rechnung Generator"
+	/>
+	<meta
+		property="twitter:description"
+		content="Erstellen Sie professionelle, ZUGFeRD-konforme E-Rechnungen kostenlos direkt im Browser. Keine Anmeldung erforderlich."
+	/>
+	<!-- <meta property="twitter:image" content="https://rechnungs-ersteller.com/og-image.jpg" /> -->
+
+	<script type="application/ld+json">
+		{
+			"@context": "https://schema.org",
+			"@type": "WebApplication",
+			"name": "Rechnungs-Ersteller",
+			"applicationCategory": "BusinessApplication",
+			"operatingSystem": "Any",
+			"offers": {
+				"@type": "Offer",
+				"price": "0",
+				"priceCurrency": "EUR"
+			},
+			"description": "Kostenloses Tool zum Erstellen von ZUGFeRD-konformen E-Rechnungen direkt im Browser.",
+			"featureList": "ZUGFeRD Export, PDF Generierung, Lokale Datenspeicherung, Dark Mode",
+			"author": {
+				"@type": "Person",
+				"name": "Tim Gromeyer"
+			}
+		}
+	</script>
+</svelte:head>
+
+<div class="flex min-h-screen flex-col">
+	<Navbar />
+
+	<main class="flex-1">
+		<!-- Hero Section -->
+		<section class="container mx-auto px-4 py-24 text-center md:py-32">
+			<h1 class="mb-6 text-4xl font-extrabold tracking-tight sm:text-5xl md:text-6xl">
+				Rechnungen schreiben <br class="hidden sm:inline" />
+				<span class="text-primary">einfach gemacht</span>
+			</h1>
+			<p class="text-muted-foreground mx-auto mb-10 max-w-[700px] text-lg md:text-xl">
+				Erstellen Sie professionelle, ZUGFeRD-konforme Rechnungen direkt in Ihrem Browser. Keine
+				Anmeldung, keine Kosten, Ihre Daten bleiben bei Ihnen.
+			</p>
+			<div class="flex flex-col items-center justify-center gap-4 sm:flex-row">
+				<Button size="lg" href="/dashboard" class="gap-2">
+					Zur Übersicht <ArrowRight size={18} />
+				</Button>
+				<Button
+					variant="outline"
+					size="lg"
+					href="https://github.com/tim-gromeyer/rechnungs-ersteller"
 				>
-					Rechnungs-Ersteller
-				</a>
-				<!-- eslint-enable svelte/no-navigation-without-resolve -->
-				<div class="flex items-center gap-2">
-					<button
-						onclick={toggleMode}
-						class={cn(
-							'border-input bg-background hover:bg-accent hover:text-accent-foreground inline-flex h-10 w-10 items-center justify-center rounded-lg border transition-all hover:scale-105 active:scale-95'
-						)}
-						aria-label="Toggle theme"
-					>
-						{#if isDarkMode}
-							<Sun size={20} />
-						{:else}
-							<Moon size={20} />
-						{/if}
-					</button>
-					<button
-						onclick={handleNewInvoice}
-						class={cn(
-							'border-input bg-background hover:bg-accent hover:text-accent-foreground inline-flex h-10 items-center justify-center gap-2 rounded-lg border px-4 text-sm font-medium transition-all hover:scale-105 active:scale-95'
-						)}
-					>
-						<FileText size={18} />
-						<span class="hidden sm:inline">Neue Rechnung</span>
-					</button>
-					<button
-						onclick={handlePrint}
-						class={cn(
-							'bg-primary text-primary-foreground shadow-primary/25 hover:bg-primary/90 inline-flex h-10 items-center justify-center gap-2 rounded-lg px-4 text-sm font-medium shadow-lg transition-all hover:scale-105 active:scale-95'
-						)}
-					>
-						<Printer size={18} />
-						<span class="hidden sm:inline">PDF Speichern</span>
-					</button>
-					<button
-						onclick={handleDownloadXml}
-						class={cn(
-							'border-input bg-background hover:bg-accent hover:text-accent-foreground inline-flex h-10 items-center justify-center gap-2 rounded-lg border px-4 text-sm font-medium transition-all hover:scale-105 active:scale-95'
-						)}
-					>
-						<Download size={18} />
-						<span class="hidden sm:inline">XML (ZUGFeRD)</span>
-					</button>
+					GitHub
+				</Button>
+			</div>
+		</section>
+
+		<!-- Features Section -->
+		<section class="bg-muted/30 py-24">
+			<div class="container mx-auto px-4">
+				<div class="grid gap-12 md:grid-cols-3">
+					<div class="flex flex-col items-center text-center">
+						<div class="bg-primary/10 mb-6 flex h-16 w-16 items-center justify-center rounded-full">
+							<CheckCircle2 class="text-primary h-8 w-8" />
+						</div>
+						<h3 class="mb-3 text-xl font-bold">Lokal & Sicher</h3>
+						<p class="text-muted-foreground">
+							Alle Daten werden lokal in Ihrem Browser gespeichert. Nichts wird auf unsere Server
+							hochgeladen.
+						</p>
+					</div>
+					<div class="flex flex-col items-center text-center">
+						<div class="bg-primary/10 mb-6 flex h-16 w-16 items-center justify-center rounded-full">
+							<CheckCircle2 class="text-primary h-8 w-8" />
+						</div>
+						<h3 class="mb-3 text-xl font-bold">ZUGFeRD Konform</h3>
+						<p class="text-muted-foreground">
+							Erstellen Sie automatisch E-Rechnungen nach dem ZUGFeRD-Standard für maximale
+							Kompatibilität.
+						</p>
+					</div>
+					<div class="flex flex-col items-center text-center">
+						<div class="bg-primary/10 mb-6 flex h-16 w-16 items-center justify-center rounded-full">
+							<CheckCircle2 class="text-primary h-8 w-8" />
+						</div>
+						<h3 class="mb-3 text-xl font-bold">Kostenlos</h3>
+						<p class="text-muted-foreground">
+							Unser Tool ist Open Source und komplett kostenlos nutzbar. Keine versteckten Gebühren.
+						</p>
+					</div>
 				</div>
 			</div>
-		</nav>
+		</section>
+	</main>
 
-		<!-- Main Content -->
-		<main
-			class="mx-auto flex w-full max-w-[1800px] flex-grow flex-col items-start gap-8 p-4 md:p-8 lg:flex-row"
-		>
-			<!-- Editor Column -->
-			<div class="w-full lg:w-1/2 xl:w-5/12 print:hidden">
-				<InvoiceForm />
-			</div>
-
-			<!-- Preview Column -->
-			<div
-				class="sticky top-24 max-h-[calc(100vh-7rem)] w-full overflow-auto lg:w-1/2 xl:w-7/12 print:static print:max-h-none print:w-full"
-			>
-				<div
-					class="bg-muted/30 flex justify-center rounded-xl p-4 backdrop-blur-sm print:bg-white print:p-0"
-				>
-					<InvoicePreview />
-				</div>
-			</div>
-		</main>
-	</div>
-</StatePersistence>
-
-<style>
-	@media print {
-		@page {
-			margin: 0;
-			size: A4 portrait;
-		}
-
-		:global(body) {
-			background-color: white !important;
-			margin: 0 !important;
-			padding: 0 !important;
-		}
-
-		:global(html) {
-			background-color: white !important;
-		}
-	}
-</style>
+	<footer class="border-t py-8">
+		<div class="text-muted-foreground container mx-auto px-4 text-center text-sm">
+			<p>&copy; {new Date().getFullYear()} Rechnungs-Ersteller. Open Source.</p>
+		</div>
+	</footer>
+</div>

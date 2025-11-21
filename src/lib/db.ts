@@ -6,68 +6,104 @@ const STORE_INVOICES = 'invoices';
 const STORE_SETTINGS = 'settings';
 
 export const db = {
-    async initDB(): Promise<IDBDatabase> {
-        return new Promise((resolve, reject) => {
-            const request = indexedDB.open(DB_NAME, DB_VERSION);
+	async initDB(): Promise<IDBDatabase> {
+		return new Promise((resolve, reject) => {
+			const request = indexedDB.open(DB_NAME, DB_VERSION);
 
-            request.onerror = () => reject(request.error);
-            request.onsuccess = () => resolve(request.result);
+			request.onerror = () => reject(request.error);
+			request.onsuccess = () => resolve(request.result);
 
-            request.onupgradeneeded = (event) => {
-                const db = (event.target as IDBOpenDBRequest).result;
+			request.onupgradeneeded = (event) => {
+				const db = (event.target as IDBOpenDBRequest).result;
 
-                if (!db.objectStoreNames.contains(STORE_INVOICES)) {
-                    db.createObjectStore(STORE_INVOICES, { keyPath: 'id' });
-                }
+				if (!db.objectStoreNames.contains(STORE_INVOICES)) {
+					db.createObjectStore(STORE_INVOICES, { keyPath: 'id' });
+				}
 
-                if (!db.objectStoreNames.contains(STORE_SETTINGS)) {
-                    db.createObjectStore(STORE_SETTINGS, { keyPath: 'key' });
-                }
-            };
-        });
-    },
+				if (!db.objectStoreNames.contains(STORE_SETTINGS)) {
+					db.createObjectStore(STORE_SETTINGS, { keyPath: 'key' });
+				}
+			};
+		});
+	},
 
-    async saveInvoice(invoice: Invoice): Promise<void> {
-        const db = await this.initDB();
-        return new Promise((resolve, reject) => {
-            const transaction = db.transaction([STORE_INVOICES, STORE_SETTINGS], 'readwrite');
+	async saveInvoice(invoice: Invoice): Promise<void> {
+		const db = await this.initDB();
+		return new Promise((resolve, reject) => {
+			const transaction = db.transaction([STORE_INVOICES, STORE_SETTINGS], 'readwrite');
 
-            transaction.onerror = () => reject(transaction.error);
-            transaction.oncomplete = () => resolve();
+			transaction.onerror = () => reject(transaction.error);
+			transaction.oncomplete = () => resolve();
 
-            const invoiceStore = transaction.objectStore(STORE_INVOICES);
-            invoiceStore.put(invoice);
+			const invoiceStore = transaction.objectStore(STORE_INVOICES);
+			invoiceStore.put(invoice);
 
-            const settingsStore = transaction.objectStore(STORE_SETTINGS);
-            settingsStore.put({ key: 'lastInvoiceId', value: invoice.id });
-        });
-    },
+			const settingsStore = transaction.objectStore(STORE_SETTINGS);
+			settingsStore.put({ key: 'lastInvoiceId', value: invoice.id });
+		});
+	},
 
-    async loadLastActiveInvoice(): Promise<Invoice | null> {
-        const db = await this.initDB();
-        return new Promise((resolve, reject) => {
-            const transaction = db.transaction([STORE_INVOICES, STORE_SETTINGS], 'readonly');
+	async loadLastActiveInvoice(): Promise<Invoice | null> {
+		const db = await this.initDB();
+		return new Promise((resolve, reject) => {
+			const transaction = db.transaction([STORE_INVOICES, STORE_SETTINGS], 'readonly');
 
-            transaction.onerror = () => reject(transaction.error);
+			transaction.onerror = () => reject(transaction.error);
 
-            const settingsStore = transaction.objectStore(STORE_SETTINGS);
-            const settingsRequest = settingsStore.get('lastInvoiceId');
+			const settingsStore = transaction.objectStore(STORE_SETTINGS);
+			const settingsRequest = settingsStore.get('lastInvoiceId');
 
-            settingsRequest.onsuccess = () => {
-                const lastId = settingsRequest.result?.value;
+			settingsRequest.onsuccess = () => {
+				const lastId = settingsRequest.result?.value;
 
-                if (!lastId) {
-                    resolve(null);
-                    return;
-                }
+				if (!lastId) {
+					resolve(null);
+					return;
+				}
 
-                const invoiceStore = transaction.objectStore(STORE_INVOICES);
-                const invoiceRequest = invoiceStore.get(lastId);
+				const invoiceStore = transaction.objectStore(STORE_INVOICES);
+				const invoiceRequest = invoiceStore.get(lastId);
 
-                invoiceRequest.onsuccess = () => {
-                    resolve(invoiceRequest.result || null);
-                };
-            };
-        });
-    }
+				invoiceRequest.onsuccess = () => {
+					resolve(invoiceRequest.result || null);
+				};
+			};
+		});
+	},
+
+	async getAllInvoices(): Promise<Invoice[]> {
+		const db = await this.initDB();
+		return new Promise((resolve, reject) => {
+			const transaction = db.transaction(STORE_INVOICES, 'readonly');
+			const store = transaction.objectStore(STORE_INVOICES);
+			const request = store.getAll();
+
+			request.onerror = () => reject(request.error);
+			request.onsuccess = () => resolve(request.result);
+		});
+	},
+
+	async deleteInvoice(id: string): Promise<void> {
+		const db = await this.initDB();
+		return new Promise((resolve, reject) => {
+			const transaction = db.transaction(STORE_INVOICES, 'readwrite');
+			const store = transaction.objectStore(STORE_INVOICES);
+			const request = store.delete(id);
+
+			request.onerror = () => reject(request.error);
+			request.onsuccess = () => resolve();
+		});
+	},
+
+	async getInvoice(id: string): Promise<Invoice | undefined> {
+		const db = await this.initDB();
+		return new Promise((resolve, reject) => {
+			const transaction = db.transaction(STORE_INVOICES, 'readonly');
+			const store = transaction.objectStore(STORE_INVOICES);
+			const request = store.get(id);
+
+			request.onerror = () => reject(request.error);
+			request.onsuccess = () => resolve(request.result);
+		});
+	}
 };
