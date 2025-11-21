@@ -9,10 +9,11 @@
 		if (!browser) return;
 
 		// Access invoiceState.invoice directly to maintain reactivity
-		const currentInvoice = invoiceState.invoice;
+		// Serialize synchronously to track all deep dependencies
+		const serialized = JSON.stringify(invoiceState.invoice);
 
 		const handler = setTimeout(() => {
-			localStorage.setItem('invoice-state', JSON.stringify(currentInvoice));
+			localStorage.setItem('invoice-state', serialized);
 		}, 500);
 
 		return () => {

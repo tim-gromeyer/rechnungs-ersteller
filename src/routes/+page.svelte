@@ -54,18 +54,18 @@
 
 <StatePersistence>
 	<div
-		class="flex min-h-screen flex-col bg-gradient-to-br from-background via-background to-muted/20"
+		class="from-background via-background to-muted/20 flex min-h-screen flex-col bg-gradient-to-br"
 	>
 		<!-- Navbar -->
 		<nav
-			class="sticky top-0 z-50 border-b border-border/40 bg-background/80 backdrop-blur-xl supports-[backdrop-filter]:bg-background/60 print:hidden"
+			class="border-border/40 bg-background/80 supports-[backdrop-filter]:bg-background/60 sticky top-0 z-50 border-b backdrop-blur-xl print:hidden"
 		>
 			<div class="mx-auto flex h-16 max-w-[1800px] items-center justify-between px-4 md:px-8">
 				<!-- eslint-disable-next-line svelte/no-navigation-without-resolve -->
 				<!-- eslint-disable svelte/no-navigation-without-resolve -->
 				<a
 					href="/"
-					class="flex items-center gap-2 text-xl font-semibold tracking-tight transition-colors hover:text-primary"
+					class="hover:text-primary flex items-center gap-2 text-xl font-semibold tracking-tight transition-colors"
 				>
 					Rechnungs-Ersteller
 				</a>
@@ -74,7 +74,7 @@
 					<button
 						onclick={toggleMode}
 						class={cn(
-							'inline-flex h-10 w-10 items-center justify-center rounded-lg border border-input bg-background transition-all hover:scale-105 hover:bg-accent hover:text-accent-foreground active:scale-95'
+							'border-input bg-background hover:bg-accent hover:text-accent-foreground inline-flex h-10 w-10 items-center justify-center rounded-lg border transition-all hover:scale-105 active:scale-95'
 						)}
 						aria-label="Toggle theme"
 					>
@@ -87,7 +87,7 @@
 					<button
 						onclick={handleNewInvoice}
 						class={cn(
-							'inline-flex h-10 items-center justify-center gap-2 rounded-lg border border-input bg-background px-4 text-sm font-medium transition-all hover:scale-105 hover:bg-accent hover:text-accent-foreground active:scale-95'
+							'border-input bg-background hover:bg-accent hover:text-accent-foreground inline-flex h-10 items-center justify-center gap-2 rounded-lg border px-4 text-sm font-medium transition-all hover:scale-105 active:scale-95'
 						)}
 					>
 						<FileText size={18} />
@@ -96,7 +96,7 @@
 					<button
 						onclick={handlePrint}
 						class={cn(
-							'inline-flex h-10 items-center justify-center gap-2 rounded-lg bg-primary px-4 text-sm font-medium text-primary-foreground shadow-lg shadow-primary/25 transition-all hover:scale-105 hover:bg-primary/90 active:scale-95'
+							'bg-primary text-primary-foreground shadow-primary/25 hover:bg-primary/90 inline-flex h-10 items-center justify-center gap-2 rounded-lg px-4 text-sm font-medium shadow-lg transition-all hover:scale-105 active:scale-95'
 						)}
 					>
 						<Printer size={18} />
@@ -105,7 +105,7 @@
 					<button
 						onclick={handleDownloadXml}
 						class={cn(
-							'inline-flex h-10 items-center justify-center gap-2 rounded-lg border border-input bg-background px-4 text-sm font-medium transition-all hover:scale-105 hover:bg-accent hover:text-accent-foreground active:scale-95'
+							'border-input bg-background hover:bg-accent hover:text-accent-foreground inline-flex h-10 items-center justify-center gap-2 rounded-lg border px-4 text-sm font-medium transition-all hover:scale-105 active:scale-95'
 						)}
 					>
 						<Download size={18} />
@@ -129,7 +129,7 @@
 				class="sticky top-24 max-h-[calc(100vh-7rem)] w-full overflow-auto lg:w-1/2 xl:w-7/12 print:static print:max-h-none print:w-full"
 			>
 				<div
-					class="flex justify-center rounded-xl bg-muted/30 p-4 backdrop-blur-sm print:bg-white print:p-0"
+					class="bg-muted/30 flex justify-center rounded-xl p-4 backdrop-blur-sm print:bg-white print:p-0"
 				>
 					<InvoicePreview />
 				</div>
