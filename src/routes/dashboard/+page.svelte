@@ -8,7 +8,7 @@
 	import { ArrowLeft, Trash2, Edit } from 'lucide-svelte';
 	import ConfirmDialog from '../components/ConfirmDialog.svelte';
 	import { invoiceState } from '$lib/state.svelte';
-	import { _ } from 'svelte-i18n';
+	import * as m from '$lib/paraglide/messages';
 
 	let invoices = $state<Invoice[]>([]);
 	let deleteDialogOpen = $state(false);
@@ -91,18 +91,18 @@
 			<Button variant="ghost" size="icon" href="/">
 				<ArrowLeft size={24} />
 			</Button>
-			<h1 class="text-3xl font-bold">{$_('dashboard.title')}</h1>
+			<h1 class="text-3xl font-bold">{m.dashboard_title()}</h1>
 		</div>
-		<Button onclick={handleCreateNew} variant="default">{$_('dashboard.newInvoice')}</Button>
+		<Button onclick={handleCreateNew} variant="default">{m.dashboard_newInvoice()}</Button>
 	</div>
 
 	<div class="grid gap-4">
 		{#if invoices.length === 0}
 			<Card>
 				<CardContent class="text-muted-foreground flex flex-col items-center justify-center py-12">
-					<p>{$_('dashboard.noInvoicesFound')}</p>
+					<p>{m.dashboard_noInvoicesFound()}</p>
 					<Button variant="link" onclick={handleCreateNew}
-						>{$_('dashboard.createFirstInvoice')}</Button
+						>{m.dashboard_createFirstInvoice()}</Button
 					>
 				</CardContent>
 			</Card>
@@ -112,15 +112,13 @@
 					<CardContent class="flex items-center justify-between p-6">
 						<div class="grid gap-1">
 							<div class="font-semibold">
-								{invoice.number || $_('dashboard.draft')}
+								{invoice.number || m.dashboard_draft()}
 								<span class="text-muted-foreground ml-2 font-normal">
 									{new Date(invoice.date).toLocaleDateString('de-DE')}
 								</span>
 							</div>
 							<div class="text-muted-foreground text-sm">
-								{invoice.customer.company ||
-									invoice.customer.name ||
-									$_('dashboard.unknownCustomer')}
+								{invoice.customer.company || invoice.customer.name || m.dashboard_unknownCustomer()}
 							</div>
 						</div>
 
@@ -151,8 +149,8 @@
 
 <ConfirmDialog
 	bind:open={deleteDialogOpen}
-	title={$_('dashboard.deleteInvoice')}
-	description={$_('dashboard.confirmDeleteDescription')}
+	title={m.dashboard_deleteInvoice()}
+	description={m.dashboard_confirmDeleteDescription()}
 	onConfirm={handleDelete}
 	onCancel={() => (deleteDialogOpen = false)}
 />

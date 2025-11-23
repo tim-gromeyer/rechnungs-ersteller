@@ -2,7 +2,7 @@
 	import { toggleMode } from 'mode-watcher';
 	import { cn } from '$lib/utils/cn';
 	import { Moon, Sun, FileText } from 'lucide-svelte';
-	import { t } from 'svelte-i18n';
+	import * as m from '$lib/paraglide/messages';
 
 	import type { Snippet } from 'svelte';
 	import LanguageSwitcher from './LanguageSwitcher.svelte';
@@ -37,7 +37,7 @@
 			href="/"
 			class="hover:text-primary flex items-center gap-2 text-xl font-semibold tracking-tight transition-colors"
 		>
-			{$t('meta.app_name')}
+			{m.meta_app_name()}
 		</a>
 		<div class="flex items-center gap-2">
 			<LanguageSwitcher />
@@ -63,7 +63,7 @@
 				)}
 			>
 				<FileText size={18} />
-				<span class="hidden sm:inline">{$t('common.dashboard')}</span>
+				<span class="hidden sm:inline">{m.common_dashboard()}</span>
 			</a>
 
 			{@render children?.()}

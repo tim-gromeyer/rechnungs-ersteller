@@ -1,8 +1,11 @@
-import { register, init } from 'svelte-i18n';
+import { localizeHref, getLocale } from '$lib/paraglide/runtime';
 
-register('en', () => import('./locales/en.json'));
-register('de', () => import('./locales/de.json'));
-
-init({
-	fallbackLocale: 'en'
-});
+export const i18n = {
+	resolveRoute: (path: string, locale: string) => {
+		return localizeHref(path, { locale });
+	},
+	route: (path: string) => {
+		return localizeHref(path, { locale: getLocale() });
+	},
+	getLanguageTag: getLocale
+};

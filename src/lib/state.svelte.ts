@@ -3,8 +3,6 @@ import { generateInvoiceNumber } from './utils/invoice-number';
 import { browser } from '$app/environment';
 import { createInvoiceSchema } from './validation'; // Import the factory function
 import { z } from 'zod'; // Import z from zod
-import { _ } from 'svelte-i18n'; // Import translation store
-import { get } from 'svelte/store'; // Import get to read store value
 
 // Type for storing validation errors
 type InvoiceValidationErrors = z.ZodFormattedError<Invoice> | null;
@@ -69,11 +67,8 @@ function createInvoiceState() {
 
 	// Function to validate the current invoice state
 	function validateInvoice() {
-		// Get the current translation function
-		const t = get(_);
-
-		// Create schema with current locale's translations
-		const { invoiceSchema } = createInvoiceSchema((key: string) => t(key) as string);
+		// Create schema (messages are automatically localized by Paraglide)
+		const { invoiceSchema } = createInvoiceSchema();
 
 		const result = invoiceSchema.safeParse(invoice);
 		if (!result.success) {

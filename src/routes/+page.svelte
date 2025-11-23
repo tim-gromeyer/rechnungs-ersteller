@@ -2,7 +2,7 @@
 	import Navbar from './components/Navbar.svelte';
 	import { Button } from '$lib/components/ui/button';
 	import { ArrowRight, CheckCircle2 } from 'lucide-svelte';
-	import { t } from 'svelte-i18n';
+	import * as m from '$lib/paraglide/messages';
 </script>
 
 <svelte:head>
@@ -27,7 +27,7 @@
 		property="og:description"
 		content="Erstellen Sie professionelle, ZUGFeRD-konforme E-Rechnungen kostenlos direkt im Browser. Keine Anmeldung erforderlich. Ihre Daten bleiben lokal und sicher."
 	/>
-	<meta property="og:site_name" content={$t('meta.app_name')} />
+	<meta property="og:site_name" content={m.meta_app_name()} />
 	<!-- <meta property="og:image" content="https://rechnungs-ersteller.com/og-image.jpg" /> -->
 
 	<!-- Twitter -->
@@ -72,15 +72,15 @@
 		<!-- Hero Section -->
 		<section class="container mx-auto px-4 py-24 text-center md:py-32">
 			<h1 class="mb-6 text-4xl font-extrabold tracking-tight sm:text-5xl md:text-6xl">
-				{$t('landing.title')} <br class="hidden sm:inline" />
-				<span class="text-primary">{$t('landing.titleHighlight')}</span>
+				{m.landing_title()} <br class="hidden sm:inline" />
+				<span class="text-primary">{m.landing_titleHighlight()}</span>
 			</h1>
 			<p class="text-muted-foreground mx-auto mb-10 max-w-[700px] text-lg md:text-xl">
-				{$t('landing.subtitle')}
+				{m.landing_subtitle()}
 			</p>
 			<div class="flex flex-col items-center justify-center gap-4 sm:flex-row">
 				<Button size="lg" href="/dashboard" class="gap-2">
-					{$t('common.dashboard')}
+					{m.common_dashboard()}
 					<ArrowRight size={18} />
 				</Button>
 				<Button
@@ -88,7 +88,7 @@
 					size="lg"
 					href="https://github.com/tim-gromeyer/rechnungs-ersteller"
 				>
-					{$t('common.github')}
+					{m.common_github()}
 				</Button>
 			</div>
 		</section>
@@ -101,27 +101,27 @@
 						<div class="bg-primary/10 mb-6 flex h-16 w-16 items-center justify-center rounded-full">
 							<CheckCircle2 class="text-primary h-8 w-8" />
 						</div>
-						<h3 class="mb-3 text-xl font-bold">{$t('landing.features.localSecure.title')}</h3>
+						<h3 class="mb-3 text-xl font-bold">{m.landing_features_localSecure_title()}</h3>
 						<p class="text-muted-foreground">
-							{$t('landing.features.localSecure.description')}
+							{m.landing_features_localSecure_description()}
 						</p>
 					</div>
 					<div class="flex flex-col items-center text-center">
 						<div class="bg-primary/10 mb-6 flex h-16 w-16 items-center justify-center rounded-full">
 							<CheckCircle2 class="text-primary h-8 w-8" />
 						</div>
-						<h3 class="mb-3 text-xl font-bold">{$t('landing.features.zugferd.title')}</h3>
+						<h3 class="mb-3 text-xl font-bold">{m.landing_features_zugferd_title()}</h3>
 						<p class="text-muted-foreground">
-							{$t('landing.features.zugferd.description')}
+							{m.landing_features_zugferd_description()}
 						</p>
 					</div>
 					<div class="flex flex-col items-center text-center">
 						<div class="bg-primary/10 mb-6 flex h-16 w-16 items-center justify-center rounded-full">
 							<CheckCircle2 class="text-primary h-8 w-8" />
 						</div>
-						<h3 class="mb-3 text-xl font-bold">{$t('landing.features.free.title')}</h3>
+						<h3 class="mb-3 text-xl font-bold">{m.landing_features_free_title()}</h3>
 						<p class="text-muted-foreground">
-							{$t('landing.features.free.description')}
+							{m.landing_features_free_description()}
 						</p>
 					</div>
 				</div>
@@ -131,7 +131,7 @@
 
 	<footer class="border-t py-8">
 		<div class="text-muted-foreground container mx-auto px-4 text-center text-sm">
-			<p>{$t('landing.footer', { values: { year: new Date().getFullYear() } })}</p>
+			<p>{m.landing_footer({ year: new Date().getFullYear() })}</p>
 		</div>
 	</footer>
 </div>

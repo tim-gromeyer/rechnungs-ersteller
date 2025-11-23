@@ -11,7 +11,7 @@
 	import { cn } from '$lib/utils/cn';
 	import { db } from '$lib/db';
 	import { goto } from '$app/navigation';
-	import { t } from 'svelte-i18n';
+	import * as m from '$lib/paraglide/messages';
 
 	let id = $derived($page.params.id);
 	let loading = $state(true);
@@ -72,7 +72,7 @@
 					)}
 				>
 					<Printer size={18} />
-					<span class="hidden sm:inline">{$t('preview.savePdf')}</span>
+					<span class="hidden sm:inline">{m.preview_savePdf()}</span>
 				</button>
 				<button
 					onclick={handleDownloadXml}
@@ -81,7 +81,7 @@
 					)}
 				>
 					<Download size={18} />
-					<span class="hidden sm:inline">{$t('preview.downloadXml')}</span>
+					<span class="hidden sm:inline">{m.preview_downloadXml()}</span>
 				</button>
 			</Navbar>
 

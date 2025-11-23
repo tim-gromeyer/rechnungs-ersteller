@@ -9,7 +9,8 @@
 	import * as Card from '$lib/components/ui/card';
 	import ArticleCard from './ArticleCard.svelte';
 	import DiscountCard from './DiscountCard.svelte';
-	import { t, locale } from 'svelte-i18n';
+	import * as m from '$lib/paraglide/messages';
+	import { getLocale } from '$lib/paraglide/runtime';
 
 	// Don't destructure invoice - access it reactively through invoiceState
 	const { addArticle, removeArticle, addDiscount, removeDiscount } = invoiceState;
@@ -18,7 +19,7 @@
 	$effect(() => {
 		// Track both invoice and locale changes
 		void invoiceState.invoice;
-		void $locale; // This makes the effect reactive to locale changes
+		void getLocale(); // This makes the effect reactive to locale changes
 		invoiceState.validateInvoice();
 	});
 
@@ -83,7 +84,7 @@
 				<Accordion.Trigger
 					class="hover:bg-accent/50 flex w-full items-center justify-between px-6 py-4 text-left transition-all"
 				>
-					<h3 class="text-card-foreground text-lg font-semibold">{$t('form.general')}</h3>
+					<h3 class="text-card-foreground text-lg font-semibold">{m.form_general()}</h3>
 					<ChevronDown
 						class="h-5 w-5 transition-transform duration-200 [[data-state=open]_&]:rotate-180"
 					/>
@@ -95,7 +96,7 @@
 				<div class="grid grid-cols-1 gap-4 px-6 pt-2 pb-6 md:grid-cols-2">
 					<div class="space-y-2">
 						<Label.Root for="input-invoice-number" class="text-foreground text-sm font-medium">
-							{$t('form.invoiceNumber')}
+							{m.form_invoiceNumber()}
 						</Label.Root>
 						<Input.Root
 							type="text"
@@ -106,7 +107,7 @@
 					</div>
 					<div class="space-y-2">
 						<Label.Root for="input-invoice-date" class="text-foreground text-sm font-medium">
-							{$t('form.date')}
+							{m.form_date()}
 						</Label.Root>
 						<Input.Root
 							type="date"
@@ -116,7 +117,7 @@
 					</div>
 					<div class="space-y-2">
 						<Label.Root for="input-service-date" class="text-foreground text-sm font-medium">
-							{$t('form.serviceDate')}
+							{m.form_serviceDate()}
 						</Label.Root>
 						<Input.Root
 							type="text"
@@ -127,7 +128,7 @@
 					</div>
 					<div class="space-y-2">
 						<Label.Root for="input-payment-days" class="text-foreground text-sm font-medium">
-							{$t('form.paymentTerms')}
+							{m.form_paymentTerms()}
 						</Label.Root>
 						<Input.Root
 							type="number"
@@ -143,7 +144,7 @@
 					</div>
 					<div class="space-y-2">
 						<Label.Root for="input-vat-rate" class="text-foreground text-sm font-medium">
-							{$t('form.vatRate')}
+							{m.form_vatRate()}
 						</Label.Root>
 						<Input.Root
 							type="number"
@@ -159,7 +160,7 @@
 					</div>
 					<div class="space-y-2">
 						<Label.Root for="input-currency" class="text-foreground text-sm font-medium">
-							{$t('form.currency')}
+							{m.form_currency()}
 						</Label.Root>
 						<Input.Root
 							type="text"
@@ -171,7 +172,7 @@
 					<!-- Logo Upload -->
 					<div class="space-y-2 md:col-span-2">
 						<Label.Root for="input-logo" class="text-foreground text-sm font-medium"
-							>{$t('form.logo')}</Label.Root
+							>{m.form_logo()}</Label.Root
 						>
 
 						{#if invoiceState.invoice.settings.logoPath}
@@ -183,7 +184,7 @@
 								/>
 								<Button.Root onclick={removeLogo} variant="destructive" size="sm">
 									<X size={16} />
-									{$t('form.remove')}
+									{m.form_remove()}
 								</Button.Root>
 							</div>
 						{:else}
@@ -198,7 +199,7 @@
 					<!-- Customizable Texts -->
 					<div class="space-y-2 md:col-span-2">
 						<Label.Root for="input-payment-text" class="text-foreground text-sm font-medium">
-							{$t('form.paymentText')}
+							{m.form_paymentText()}
 						</Label.Root>
 						<Textarea.Root
 							id="input-payment-text"
@@ -208,7 +209,7 @@
 					</div>
 					<div class="space-y-2 md:col-span-2">
 						<Label.Root for="input-tax-note" class="text-foreground text-sm font-medium">
-							{$t('form.taxNote')}
+							{m.form_taxNote()}
 						</Label.Root>
 						<Input.Root
 							type="text"
@@ -230,7 +231,7 @@
 				<Accordion.Trigger
 					class="hover:bg-accent/50 flex w-full items-center justify-between px-6 py-4 text-left transition-all"
 				>
-					<h3 class="text-card-foreground text-lg font-semibold">{$t('form.recipient')}</h3>
+					<h3 class="text-card-foreground text-lg font-semibold">{m.form_recipient()}</h3>
 					<ChevronDown
 						class="h-5 w-5 transition-transform duration-200 [[data-state=open]_&]:rotate-180"
 					/>
@@ -242,7 +243,7 @@
 				<div class="grid grid-cols-1 gap-4 px-6 pt-2 pb-6 md:grid-cols-2">
 					<div class="space-y-2">
 						<Label.Root for="input-customer-company" class="text-foreground text-sm font-medium">
-							{$t('form.company')}
+							{m.form_company()}
 						</Label.Root>
 						<Input.Root
 							type="text"
@@ -252,7 +253,7 @@
 					</div>
 					<div class="space-y-2">
 						<Label.Root for="input-customer-name" class="text-foreground text-sm font-medium">
-							{$t('form.name')}
+							{m.form_name()}
 						</Label.Root>
 						<Input.Root
 							type="text"
@@ -268,7 +269,7 @@
 					</div>
 					<div class="space-y-2 md:col-span-2">
 						<Label.Root for="input-customer-street" class="text-foreground text-sm font-medium">
-							{$t('form.street')}
+							{m.form_street()}
 						</Label.Root>
 						<Input.Root
 							type="text"
@@ -284,7 +285,7 @@
 					</div>
 					<div class="space-y-2">
 						<Label.Root for="input-customer-zip" class="text-foreground text-sm font-medium">
-							{$t('form.zip')}
+							{m.form_zip()}
 						</Label.Root>
 						<Input.Root
 							type="text"
@@ -300,7 +301,7 @@
 					</div>
 					<div class="space-y-2">
 						<Label.Root for="input-customer-city" class="text-foreground text-sm font-medium">
-							{$t('form.city')}
+							{m.form_city()}
 						</Label.Root>
 						<Input.Root
 							type="text"
@@ -327,7 +328,7 @@
 				<Accordion.Trigger
 					class="hover:bg-accent/50 flex w-full items-center justify-between px-6 py-4 text-left transition-all"
 				>
-					<h3 class="text-card-foreground text-lg font-semibold">{$t('form.sender')}</h3>
+					<h3 class="text-card-foreground text-lg font-semibold">{m.form_sender()}</h3>
 					<ChevronDown
 						class="h-5 w-5 transition-transform duration-200 [[data-state=open]_&]:rotate-180"
 					/>
@@ -339,7 +340,7 @@
 				<div class="grid grid-cols-1 gap-4 px-6 pt-2 pb-6 md:grid-cols-2">
 					<div class="space-y-2">
 						<Label.Root for="input-sender-company" class="text-foreground text-sm font-medium">
-							{$t('form.company')}
+							{m.form_company()}
 						</Label.Root>
 						<Input.Root
 							type="text"
@@ -349,7 +350,7 @@
 					</div>
 					<div class="space-y-2">
 						<Label.Root for="input-sender-name" class="text-foreground text-sm font-medium">
-							{$t('form.name')}
+							{m.form_name()}
 						</Label.Root>
 						<Input.Root
 							type="text"
@@ -365,7 +366,7 @@
 					</div>
 					<div class="space-y-2 md:col-span-2">
 						<Label.Root for="input-sender-street" class="text-foreground text-sm font-medium">
-							{$t('form.street')}
+							{m.form_street()}
 						</Label.Root>
 						<Input.Root
 							type="text"
@@ -381,7 +382,7 @@
 					</div>
 					<div class="space-y-2">
 						<Label.Root for="input-sender-zip" class="text-foreground text-sm font-medium">
-							{$t('form.zip')}
+							{m.form_zip()}
 						</Label.Root>
 						<Input.Root
 							type="text"
@@ -397,7 +398,7 @@
 					</div>
 					<div class="space-y-2">
 						<Label.Root for="input-sender-city" class="text-foreground text-sm font-medium">
-							{$t('form.city')}
+							{m.form_city()}
 						</Label.Root>
 						<Input.Root
 							type="text"
@@ -414,12 +415,12 @@
 
 					<div class="md:col-span-2">
 						<div class="bg-border my-4 h-px"></div>
-						<h4 class="text-foreground mb-4 text-sm font-semibold">{$t('form.contact')}</h4>
+						<h4 class="text-foreground mb-4 text-sm font-semibold">{m.form_contact()}</h4>
 					</div>
 
 					<div class="space-y-2">
 						<Label.Root for="input-sender-email" class="text-foreground text-sm font-medium">
-							{$t('form.email')}
+							{m.form_email()}
 						</Label.Root>
 						<Input.Root
 							type="text"
@@ -435,7 +436,7 @@
 					</div>
 					<div class="space-y-2">
 						<Label.Root for="input-sender-website" class="text-foreground text-sm font-medium">
-							{$t('form.website')}
+							{m.form_website()}
 						</Label.Root>
 						<Input.Root
 							type="text"
@@ -452,12 +453,12 @@
 
 					<div class="md:col-span-2">
 						<div class="bg-border my-4 h-px"></div>
-						<h4 class="text-foreground mb-4 text-sm font-semibold">{$t('form.bankTax')}</h4>
+						<h4 class="text-foreground mb-4 text-sm font-semibold">{m.form_bankTax()}</h4>
 					</div>
 
 					<div class="space-y-2">
 						<Label.Root for="input-sender-bank-name" class="text-foreground text-sm font-medium">
-							{$t('form.bankName')}
+							{m.form_bankName()}
 						</Label.Root>
 						<Input.Root
 							type="text"
@@ -467,7 +468,7 @@
 					</div>
 					<div class="space-y-2">
 						<Label.Root for="input-sender-iban" class="text-foreground text-sm font-medium">
-							{$t('form.iban')}
+							{m.form_iban()}
 						</Label.Root>
 						<Input.Root
 							type="text"
@@ -483,7 +484,7 @@
 					</div>
 					<div class="space-y-2">
 						<Label.Root for="input-sender-bic" class="text-foreground text-sm font-medium">
-							{$t('form.bic')}
+							{m.form_bic()}
 						</Label.Root>
 						<Input.Root
 							type="text"
@@ -499,7 +500,7 @@
 					</div>
 					<div class="space-y-2">
 						<Label.Root for="input-sender-tax-id" class="text-foreground text-sm font-medium">
-							{$t('form.taxId')}
+							{m.form_taxId()}
 						</Label.Root>
 						<Input.Root
 							type="text"
@@ -515,7 +516,7 @@
 					</div>
 					<div class="space-y-2">
 						<Label.Root for="input-sender-vat-id" class="text-foreground text-sm font-medium">
-							{$t('form.vatId')}
+							{m.form_vatId()}
 						</Label.Root>
 						<Input.Root
 							type="text"
@@ -537,10 +538,10 @@
 	<!-- Articles -->
 	<Card.Root>
 		<Card.Header class="flex flex-row items-center justify-between space-y-0 p-4">
-			<Card.Title class="text-lg font-semibold">{$t('form.items')}</Card.Title>
+			<Card.Title class="text-lg font-semibold">{m.form_items()}</Card.Title>
 			<Button.Root onclick={addArticle} size="sm">
 				<Plus size={16} />
-				{$t('form.article')}
+				{m.form_article()}
 			</Button.Root>
 		</Card.Header>
 		<Card.Content class="space-y-4 p-4 pt-0">
@@ -553,10 +554,10 @@
 	<!-- Discounts -->
 	<Card.Root>
 		<Card.Header class="flex flex-row items-center justify-between space-y-0 p-4">
-			<Card.Title class="text-lg font-semibold">{$t('form.discounts')}</Card.Title>
+			<Card.Title class="text-lg font-semibold">{m.form_discounts()}</Card.Title>
 			<Button.Root onclick={addDiscount} variant="outline" size="sm">
 				<Plus size={16} />
-				{$t('form.discount')}
+				{m.form_discount()}
 			</Button.Root>
 		</Card.Header>
 		<Card.Content class="space-y-4 p-4 pt-0">

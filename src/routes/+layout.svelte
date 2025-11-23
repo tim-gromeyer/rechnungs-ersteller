@@ -2,28 +2,23 @@
 	import '../app.css';
 
 	import { ModeWatcher } from 'mode-watcher';
-	import { t } from 'svelte-i18n';
+	import { i18n } from '$lib/i18n';
+	import * as m from '$lib/paraglide/messages';
 	import { page } from '$app/stores';
+	import { locales } from '$lib/paraglide/runtime';
 
-	let { children, data } = $props();
-	const { lang } = data; // Correctly destructure lang from data
-
-	// Define available locales
-	const locales = ['en', 'de'];
+	let { children } = $props();
 
 	// Function to generate the full URL for a given locale
 	function getHreflangUrl(locale: string) {
-		// Get the current path without the language prefix
-		const pathWithoutLang = $page.url.pathname.replace(`/${lang}`, '');
-		// Construct the new URL with the desired locale
-		return `${$page.url.origin}/${locale}${pathWithoutLang}${$page.url.search}`;
+		// i18n.resolveRoute returns the path for the given locale
+		const path = i18n.resolveRoute($page.url.pathname, locale);
+		return `${$page.url.origin}${path}`;
 	}
 </script>
 
-<ModeWatcher />
-
 <svelte:head>
-	<title>{$t('meta.app_name')} - Rechnungs-Assistent</title>
+	<title>{m.meta_app_name()} - Rechnungs-Assistent</title>
 	<meta name="description" content="Modern invoice generator with ZUGFeRD support" />
 
 	{#each locales as locale (locale)}
@@ -31,5 +26,7 @@
 	{/each}
 	<link rel="alternate" hreflang="x-default" href={getHreflangUrl('en')} />
 </svelte:head>
+
+<ModeWatcher />
 
 {@render children()}

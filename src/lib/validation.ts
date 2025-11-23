@@ -6,30 +6,29 @@ const ibanRegex = /^[A-Z]{2}[0-9]{2}(?:[ ]?[0-9]{4}){4}(?:[ ]?[0-9]{1,2})?$/;
 const bicRegex = /^[A-Z]{6}[A-Z0-9]{2}([A-Z0-9]{3})?$/;
 const phoneRegex = /^[+]?[(]?[0-9]{3}[)]?[-\\s.]?[0-9]{3}[-\\s.]?[0-9]{4,6}$/; // Basic phone number regex
 
-// Type for translation function
-type TranslateFn = (key: string) => string;
+import * as m from '$lib/paraglide/messages';
 
 // Factory function to create schemas with localized error messages
-export function createInvoiceSchema(t: TranslateFn) {
+export function createInvoiceSchema() {
 	const addressSchema = z.object({
 		company: z.string().optional(),
-		name: z.string().min(1, t('validation.nameRequired')),
-		street: z.string().min(1, t('validation.streetRequired')),
-		zip: z.string().min(1, t('validation.zipRequired')),
-		city: z.string().min(1, t('validation.cityRequired')),
+		name: z.string().min(1, m.validation_nameRequired()),
+		street: z.string().min(1, m.validation_streetRequired()),
+		zip: z.string().min(1, m.validation_zipRequired()),
+		city: z.string().min(1, m.validation_cityRequired()),
 		country: z.string().optional()
 	});
 
 	const contactInfoSchema = z.object({
-		email: z.string().email(t('validation.invalidEmail')).optional().or(z.literal('')),
-		phone: z.string().regex(phoneRegex, t('validation.invalidPhone')).optional().or(z.literal('')),
-		website: z.string().url(t('validation.invalidUrl')).optional().or(z.literal(''))
+		email: z.string().email(m.validation_invalidEmail()).optional().or(z.literal('')),
+		phone: z.string().regex(phoneRegex, m.validation_invalidPhone()).optional().or(z.literal('')),
+		website: z.string().url(m.validation_invalidUrl()).optional().or(z.literal(''))
 	});
 
 	const bankDetailsSchema = z.object({
 		bankName: z.string().optional(),
-		iban: z.string().regex(ibanRegex, t('validation.invalidIban')).optional().or(z.literal('')),
-		bic: z.string().regex(bicRegex, t('validation.invalidBic')).optional().or(z.literal('')),
+		iban: z.string().regex(ibanRegex, m.validation_invalidIban()).optional().or(z.literal('')),
+		bic: z.string().regex(bicRegex, m.validation_invalidBic()).optional().or(z.literal('')),
 		taxId: z.string().optional(),
 		vatId: z.string().optional()
 	});
@@ -37,11 +36,11 @@ export function createInvoiceSchema(t: TranslateFn) {
 	const senderSchema = addressSchema.merge(contactInfoSchema).merge(bankDetailsSchema);
 
 	const invoiceSettingsSchema = z.object({
-		locale: z.string().min(1, t('validation.localeRequired')),
-		vatRate: z.number().min(0, t('validation.vatRateNonNegative')),
-		currency: z.string().min(1, t('validation.currencyRequired')),
-		paymentDays: z.number().int().min(0, t('validation.paymentDaysNonNegative')),
-		invoiceNumberFormat: z.string().min(1, t('validation.invoiceNumberFormatRequired')),
+		locale: z.string().min(1, m.validation_localeRequired()),
+		vatRate: z.number().min(0, m.validation_vatRateNonNegative()),
+		currency: z.string().min(1, m.validation_currencyRequired()),
+		paymentDays: z.number().int().min(0, m.validation_paymentDaysNonNegative()),
+		invoiceNumberFormat: z.string().min(1, m.validation_invoiceNumberFormatRequired()),
 		logoPath: z.string().optional(),
 		paymentText: z.string().optional(),
 		taxNote: z.string().optional()
@@ -49,23 +48,23 @@ export function createInvoiceSchema(t: TranslateFn) {
 
 	const articleSchema = z.object({
 		id: z.string(),
-		description: z.string().min(1, t('validation.articleDescriptionRequired')),
-		pricePerUnit: z.number().min(0, t('validation.priceNonNegative')),
-		amount: z.number().min(1, t('validation.amountMinOne')),
+		description: z.string().min(1, m.validation_articleDescriptionRequired()),
+		pricePerUnit: z.number().min(0, m.validation_priceNonNegative()),
+		amount: z.number().min(1, m.validation_amountMinOne()),
 		summary: z.string().optional()
 	});
 
 	const discountSchema = z.object({
 		id: z.string(),
-		description: z.string().min(1, t('validation.discountDescriptionRequired')),
-		amount: z.number().min(0, t('validation.discountAmountNonNegative'))
+		description: z.string().min(1, m.validation_discountDescriptionRequired()),
+		amount: z.number().min(0, m.validation_discountAmountNonNegative())
 	});
 
 	const invoiceSchema = z.object({
-		number: z.string().min(1, t('validation.invoiceNumberRequired')),
-		date: z.string().min(1, t('validation.dateRequired')),
-		serviceDate: z.string().min(1, t('validation.serviceDateRequired')),
-		paymentDate: z.string().min(1, t('validation.paymentDateRequired')),
+		number: z.string().min(1, m.validation_invoiceNumberRequired()),
+		date: z.string().min(1, m.validation_dateRequired()),
+		serviceDate: z.string().min(1, m.validation_serviceDateRequired()),
+		paymentDate: z.string().min(1, m.validation_paymentDateRequired()),
 
 		sender: senderSchema,
 		customer: addressSchema,

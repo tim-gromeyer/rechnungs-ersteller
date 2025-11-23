@@ -1,6 +1,7 @@
 <script lang="ts">
 	import * as Dialog from '$lib/components/ui/dialog';
 	import { Button } from '$lib/components/ui/button';
+	import * as m from '$lib/paraglide/messages';
 
 	let { open = $bindable(false), title, description, onConfirm, onCancel } = $props();
 
@@ -24,8 +25,8 @@
 			</Dialog.Description>
 		</Dialog.Header>
 		<Dialog.Footer>
-			<Button variant="outline" onclick={handleCancel}>Abbrechen</Button>
-			<Button variant="destructive" onclick={handleConfirm}>Löschen</Button>
+			<Button variant="outline" onclick={handleCancel}>{m.common_cancel()}</Button>
+			<Button variant="destructive" onclick={handleConfirm}>{m.common_delete()}</Button>
 		</Dialog.Footer>
 	</Dialog.Content>
 </Dialog.Root>
