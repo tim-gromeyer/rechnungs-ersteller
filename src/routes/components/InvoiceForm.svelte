@@ -1,6 +1,6 @@
 <script lang="ts">
 	import { invoiceState } from '$lib/state.svelte';
-	import { Plus, X, ChevronDown } from 'lucide-svelte';
+	import { Plus, X, ChevronDown, Check } from 'lucide-svelte';
 	import { Accordion } from 'bits-ui';
 	import * as Input from '$lib/components/ui/input';
 	import * as Label from '$lib/components/ui/label';
@@ -11,6 +11,7 @@
 	import DiscountCard from './DiscountCard.svelte';
 	import * as m from '$lib/paraglide/messages';
 	import { getLocale } from '$lib/paraglide/runtime';
+	import { cn } from '$lib/utils/cn';
 
 	// Don't destructure invoice - access it reactively through invoiceState
 	const { addArticle, removeArticle, addDiscount, removeDiscount } = invoiceState;
@@ -71,6 +72,17 @@
 			logoInput.value = '';
 		}
 	}
+
+	function handleTemplateChange(value: 'default' | 'kleinunternehmer') {
+		invoiceState.invoice.settings.template = value;
+		if (value === 'kleinunternehmer') {
+			invoiceState.invoice.settings.vatRate = 0;
+			invoiceState.invoice.settings.taxNote = m.tax_note_kleinunternehmer();
+		} else {
+			invoiceState.invoice.settings.vatRate = 19;
+			invoiceState.invoice.settings.taxNote = '';
+		}
+	}
 </script>
 
 <div class="space-y-6">
@@ -94,6 +106,62 @@
 				class="data-[state=closed]:animate-accordion-up data-[state=open]:animate-accordion-down overflow-hidden"
 			>
 				<div class="grid grid-cols-1 gap-4 px-6 pt-2 pb-6 md:grid-cols-2">
+					<div class="space-y-2 md:col-span-2">
+						<Label.Root class="text-foreground text-sm font-medium">
+							{m.form_template()}
+						</Label.Root>
+						<div class="grid grid-cols-1 gap-4 md:grid-cols-2">
+							<!-- Kleinunternehmer -->
+							<Button.Root
+								type="button"
+								variant="outline"
+								class={cn(
+									'hover:border-primary/50 focus:ring-primary/20 relative z-10 flex h-auto cursor-pointer flex-col items-start gap-1 rounded-lg border p-4 text-left transition-all focus:ring-2 focus:outline-none',
+									invoiceState.invoice.settings.template === 'kleinunternehmer'
+										? 'border-primary bg-primary/5'
+										: 'border-border bg-card'
+								)}
+								onclick={() => handleTemplateChange('kleinunternehmer')}
+							>
+								<div class="flex w-full items-center justify-between">
+									<span class="font-semibold">{m.template_kleinunternehmer()}</span>
+									{#if invoiceState.invoice.settings.template === 'kleinunternehmer'}
+										<div class="bg-primary text-primary-foreground rounded-full p-0.5">
+											<Check size={12} />
+										</div>
+									{/if}
+								</div>
+								<span class="text-muted-foreground text-xs">
+									{m.template_kleinunternehmer_description()}
+								</span>
+							</Button.Root>
+
+							<!-- Standard -->
+							<Button.Root
+								type="button"
+								variant="outline"
+								class={cn(
+									'hover:border-primary/50 focus:ring-primary/20 relative z-10 flex h-auto cursor-pointer flex-col items-start gap-1 rounded-lg border p-4 text-left transition-all focus:ring-2 focus:outline-none',
+									invoiceState.invoice.settings.template === 'default'
+										? 'border-primary bg-primary/5'
+										: 'border-border bg-card'
+								)}
+								onclick={() => handleTemplateChange('default')}
+							>
+								<div class="flex w-full items-center justify-between">
+									<span class="font-semibold">{m.template_default()}</span>
+									{#if invoiceState.invoice.settings.template === 'default'}
+										<div class="bg-primary text-primary-foreground rounded-full p-0.5">
+											<Check size={12} />
+										</div>
+									{/if}
+								</div>
+								<span class="text-muted-foreground text-xs">
+									{m.template_default_description()}
+								</span>
+							</Button.Root>
+						</div>
+					</div>
 					<div class="space-y-2">
 						<Label.Root for="input-invoice-number" class="text-foreground text-sm font-medium">
 							{m.form_invoiceNumber()}
@@ -120,10 +188,9 @@
 							{m.form_serviceDate()}
 						</Label.Root>
 						<Input.Root
-							type="text"
+							type="date"
 							id="input-service-date"
 							bind:value={invoiceState.invoice.serviceDate}
-							placeholder="YYYY-MM-DD oder 'today'"
 						/>
 					</div>
 					<div class="space-y-2">

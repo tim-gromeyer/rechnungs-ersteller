@@ -102,5 +102,11 @@
 	"validation_dateRequired": "Datum ist erforderlich",
 	"validation_serviceDateRequired": "Leistungsdatum ist erforderlich",
 	"validation_paymentDateRequired": "Fälligkeitsdatum ist erforderlich",
-	"meta_app_name": "Rechnungs-Ersteller"
+	"meta_app_name": "Rechnungs-Ersteller",
+	"tax_note_kleinunternehmer": "Gemäß § 19 UStG wird keine Umsatzsteuer berechnet.",
+	"form_template": "Vorlage",
+	"template_default": "Standard (mit MwSt.)",
+	"template_kleinunternehmer": "Kleinunternehmer (ohne MwSt.)",
+	"template_default_description": "Für Unternehmen, die Umsatzsteuer ausweisen.",
+	"template_kleinunternehmer_description": "Für Kleinunternehmer gemäß § 19 UStG."
 }

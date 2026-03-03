@@ -220,23 +220,25 @@
 						</tr>
 					{/if}
 
-					<tr class="border-t border-gray-900">
-						<td colspan="2" class="py-1 text-gray-700">{m.invoice_net()}</td>
+					{#if invoice.settings.template !== 'kleinunternehmer'}
+						<tr class="border-t border-gray-900">
+							<td colspan="2" class="py-1 text-gray-700">{m.invoice_net()}</td>
 
-						<td colspan="2" class="py-1 text-right font-medium text-gray-900"
-							>{formatCurrency(netTotal, invoice.settings.currency, invoice.settings.locale)}</td
-						>
-					</tr>
+							<td colspan="2" class="py-1 text-right font-medium text-gray-900"
+								>{formatCurrency(netTotal, invoice.settings.currency, invoice.settings.locale)}</td
+							>
+						</tr>
 
-					<tr>
-						<td colspan="2" class="py-0.5 text-gray-700">
-							{m.invoice_plusVat({ rate: invoice.settings.vatRate })}</td
-						>
+						<tr>
+							<td colspan="2" class="py-0.5 text-gray-700">
+								{m.invoice_plusVat({ rate: invoice.settings.vatRate })}</td
+							>
 
-						<td colspan="2" class="py-0.5 text-right text-gray-700"
-							>{formatCurrency(vatTotal, invoice.settings.currency, invoice.settings.locale)}</td
-						>
-					</tr>
+							<td colspan="2" class="py-0.5 text-right text-gray-700"
+								>{formatCurrency(vatTotal, invoice.settings.currency, invoice.settings.locale)}</td
+							>
+						</tr>
+					{/if}
 
 					<tr class="font-bold">
 						<td colspan="2" class="py-1 text-gray-900">{m.invoice_gross()}</td>

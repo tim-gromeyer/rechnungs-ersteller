@@ -4,6 +4,9 @@ import { browser } from '$app/environment';
 import { createInvoiceSchema } from './validation'; // Import the factory function
 import { z } from 'zod'; // Import z from zod
 
+import { m } from '$lib/paraglide/messages';
+import { getLocale } from '$lib/paraglide/runtime';
+
 // Type for storing validation errors
 type InvoiceValidationErrors = z.ZodFormattedError<Invoice> | null;
 
@@ -18,7 +21,7 @@ function getDefaultInvoice(): Invoice {
 		id: crypto.randomUUID(),
 		number: browser ? generateInvoiceNumber() : '2025-01-1',
 		date: new Date().toISOString().split('T')[0],
-		serviceDate: 'today',
+		serviceDate: new Date().toISOString().split('T')[0],
 		paymentDate: new Date(Date.now() + 14 * 24 * 60 * 60 * 1000).toISOString().split('T')[0],
 		sender: {
 			company: '',
@@ -48,14 +51,15 @@ function getDefaultInvoice(): Invoice {
 		],
 		discounts: [],
 		settings: {
-			locale: 'de',
+			locale: getLocale() ?? 'de',
 			vatRate: 0,
 			currency: 'EUR',
 			paymentDays: 14,
 			invoiceNumberFormat: 'YYYY-MM-<number>',
 			paymentText:
 				'Bitte überweisen Sie den Betrag bis zum Fälligkeitsdatum auf das unten angegebene Konto.',
-			taxNote: 'Gemäß § 19 UStG wird keine Umsatzsteuer berechnet.'
+			taxNote: m.tax_note_kleinunternehmer(),
+			template: 'kleinunternehmer'
 		},
 		message: 'Vielen Dank für Ihren Auftrag!'
 	};
@@ -137,7 +141,7 @@ function createInvoiceState() {
 				id: crypto.randomUUID(),
 				number: newNumber,
 				date: new Date().toISOString().split('T')[0],
-				serviceDate: 'today',
+				serviceDate: new Date().toISOString().split('T')[0],
 				paymentDate: new Date(
 					Date.now() + (preservedSettings.paymentDays || 14) * 24 * 60 * 60 * 1000
 				)

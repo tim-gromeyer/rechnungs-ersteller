@@ -49,6 +49,7 @@ export interface InvoiceSettings {
 	logoPath?: string;
 	paymentText?: string; // Customizable payment instruction text
 	taxNote?: string; // Customizable tax note (e.g., §19 UStG)
+	template: 'default' | 'kleinunternehmer';
 }
 
 export interface Invoice {

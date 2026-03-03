@@ -102,5 +102,9 @@
 	"validation_dateRequired": "Date is required",
 	"validation_serviceDateRequired": "Service date is required",
 	"validation_paymentDateRequired": "Payment date is required",
-	"meta_app_name": "Invoice Creator"
+	"meta_app_name": "Invoice Creator",
+	"form_template": "Template",
+	"template_default": "Standard (with VAT)",
+	"template_kleinunternehmer": "Small Business (no VAT)",
+	"tax_note_kleinunternehmer": "According to small business regulations, no VAT is charged."
 }
