@@ -1,7 +1,7 @@
 <script lang="ts">
 	import { toggleMode } from 'mode-watcher';
 	import { cn } from '$lib/utils/cn';
-	import { Moon, Sun, FileText } from 'lucide-svelte';
+	import { Moon, Sun, FileText, Banknote, Settings } from 'lucide-svelte';
 	import * as m from '$lib/paraglide/messages';
 
 	import type { Snippet } from 'svelte';
@@ -64,6 +64,28 @@
 			>
 				<FileText size={18} />
 				<span class="hidden sm:inline">{m.common_dashboard()}</span>
+			</a>
+
+			<a
+				href="/expenses"
+				data-sveltekit-preload-data="false"
+				class={cn(
+					'border-input bg-background hover:bg-accent hover:text-accent-foreground inline-flex h-10 items-center justify-center gap-2 rounded-lg border px-4 text-sm font-medium transition-all hover:scale-105 active:scale-95'
+				)}
+			>
+				<Banknote size={18} />
+				<span class="hidden sm:inline">Ausgaben</span>
+			</a>
+
+			<a
+				href="/settings"
+				data-sveltekit-preload-data="false"
+				class={cn(
+					'border-input bg-background hover:bg-accent hover:text-accent-foreground inline-flex h-10 w-10 items-center justify-center rounded-lg border transition-all hover:scale-105 active:scale-95'
+				)}
+				aria-label="Settings"
+			>
+				<Settings size={20} />
 			</a>
 
 			{@render children?.()}

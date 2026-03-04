@@ -89,7 +89,21 @@ export function createInvoiceSchema() {
 	};
 }
 
+export function createExpenseSchema() {
+	const expenseSchema = z.object({
+		id: z.string().optional(),
+		date: z.string().min(1, m.validation_dateRequired()),
+		amount: z.number().positive(m.validation_amountPositive()),
+		description: z.string().min(1, m.validation_descriptionRequired()),
+		category: z.string().min(1, m.validation_categoryRequired()),
+		receiptId: z.string().optional()
+	});
+
+	return { expenseSchema };
+}
+
 // Type exports (using a dummy schema for type inference)
 export type InvoiceValidation = z.infer<ReturnType<typeof createInvoiceSchema>['invoiceSchema']>;
 export type SenderValidation = z.infer<ReturnType<typeof createInvoiceSchema>['senderSchema']>;
 export type CustomerValidation = z.infer<ReturnType<typeof createInvoiceSchema>['addressSchema']>;
+export type ExpenseValidation = z.infer<ReturnType<typeof createExpenseSchema>['expenseSchema']>;

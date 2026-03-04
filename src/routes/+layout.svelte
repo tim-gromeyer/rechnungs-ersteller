@@ -7,7 +7,11 @@
 	import { page } from '$app/stores';
 	import { locales } from '$lib/paraglide/runtime';
 
+	import NavSidebar from './components/NavSidebar.svelte';
+	import { cn } from '$lib/utils';
 	let { children } = $props();
+
+	let isCollapsed = $state(false);
 
 	// Function to generate the full URL for a given locale
 	function getHreflangUrl(locale: string) {
@@ -29,4 +33,17 @@
 
 <ModeWatcher />
 
-{@render children()}
+<div class="bg-background min-h-screen">
+	<NavSidebar bind:isCollapsed />
+	<main
+		class={cn(
+			'transition-all duration-300 ease-in-out',
+			isCollapsed ? 'lg:pl-20' : 'lg:pl-64',
+			'pl-0' // No left padding on mobile
+		)}
+	>
+		<div class="px-4 py-8 sm:px-6 lg:px-8">
+			{@render children()}
+		</div>
+	</main>
+</div>

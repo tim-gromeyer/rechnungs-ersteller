@@ -1,7 +1,7 @@
-import type { Invoice } from './types';
+import type { Invoice, Expense } from './types';
 import { generateInvoiceNumber } from './utils/invoice-number';
 import { browser } from '$app/environment';
-import { createInvoiceSchema } from './validation'; // Import the factory function
+import { createInvoiceSchema, createExpenseSchema } from './validation'; // Import the factory function
 import { z } from 'zod'; // Import z from zod
 
 import { m } from '$lib/paraglide/messages';
@@ -9,6 +9,7 @@ import { getLocale } from '$lib/paraglide/runtime';
 
 // Type for storing validation errors
 type InvoiceValidationErrors = z.ZodFormattedError<Invoice> | null;
+type ExpenseValidationErrors = z.ZodFormattedError<Expense> | null;
 
 function loadInvoice(): Invoice {
 	// Always return default invoice initially.
@@ -61,7 +62,9 @@ function getDefaultInvoice(): Invoice {
 			taxNote: m.tax_note_kleinunternehmer(),
 			template: 'kleinunternehmer'
 		},
-		message: 'Vielen Dank für Ihren Auftrag!'
+		message: 'Vielen Dank für Ihren Auftrag!',
+		title: '',
+		isPaid: false
 	};
 }
 
@@ -158,7 +161,9 @@ function createInvoiceState() {
 				articles: [],
 				discounts: [],
 				settings: preservedSettings,
-				message: preservedMessage
+				message: preservedMessage,
+				title: '',
+				isPaid: false
 			};
 
 			// Assign the new invoice object
@@ -169,3 +174,47 @@ function createInvoiceState() {
 }
 
 export const invoiceState = createInvoiceState();
+
+function createExpenseState() {
+	let expenses = $state<Expense[]>([]);
+	let validationErrors = $state<ExpenseValidationErrors>(null);
+
+	return {
+		get expenses() {
+			return expenses;
+		},
+		set expenses(v) {
+			expenses = v;
+		},
+		get validationErrors() {
+			return validationErrors;
+		},
+		get isValid() {
+			return validationErrors === null;
+		},
+		validateExpense(expense: Partial<Expense>) {
+			const { expenseSchema } = createExpenseSchema();
+			const result = expenseSchema.safeParse(expense);
+			if (!result.success) {
+				validationErrors = result.error.format();
+			} else {
+				validationErrors = null;
+			}
+			return result.success;
+		},
+		resetValidation() {
+			validationErrors = null;
+		},
+		addExpense(expense: Expense) {
+			expenses.push(expense);
+		},
+		removeExpense(id: string) {
+			expenses = expenses.filter((e) => e.id !== id);
+		},
+		updateExpense(id: string, updatedExpense: Partial<Expense>) {
+			expenses = expenses.map((e) => (e.id === id ? { ...e, ...updatedExpense } : e));
+		}
+	};
+}
+
+export const expenseState = createExpenseState();

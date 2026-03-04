@@ -4,13 +4,13 @@
 	import InvoiceForm from '../../components/InvoiceForm.svelte';
 	import InvoicePreview from '../../components/InvoicePreview.svelte';
 	import StatePersistence from '../../components/StatePersistence.svelte';
-	import Navbar from '../../components/Navbar.svelte';
 	import { invoiceState } from '$lib/state.svelte';
 	import { generateZugferdXml } from '$lib/utils/zugferd';
-	import { Printer, Download } from 'lucide-svelte';
+	import { Printer, Download, ArrowLeft } from 'lucide-svelte';
 	import { cn } from '$lib/utils/cn';
 	import { db } from '$lib/db';
 	import { goto } from '$app/navigation';
+	import * as Button from '$lib/components/ui/button';
 	import * as m from '$lib/paraglide/messages';
 
 	let id = $derived($page.params.id);
@@ -61,29 +61,41 @@
 	</div>
 {:else}
 	<StatePersistence>
-		<div
-			class="from-background via-background to-muted/20 flex min-h-screen flex-col bg-gradient-to-br"
-		>
-			<Navbar>
-				<button
-					onclick={handlePrint}
-					class={cn(
-						'bg-primary text-primary-foreground shadow-primary/25 hover:bg-primary/90 inline-flex h-10 items-center justify-center gap-2 rounded-lg px-4 text-sm font-medium shadow-lg transition-all hover:scale-105 active:scale-95'
-					)}
-				>
-					<Printer size={18} />
-					<span class="hidden sm:inline">{m.preview_savePdf()}</span>
-				</button>
-				<button
-					onclick={handleDownloadXml}
-					class={cn(
-						'border-input bg-background hover:bg-accent hover:text-accent-foreground inline-flex h-10 items-center justify-center gap-2 rounded-lg border px-4 text-sm font-medium transition-all hover:scale-105 active:scale-95'
-					)}
-				>
-					<Download size={18} />
-					<span class="hidden sm:inline">{m.preview_downloadXml()}</span>
-				</button>
-			</Navbar>
+		<div class="bg-background flex min-h-screen flex-col">
+			<!-- Editor Header -->
+			<header class="bg-background/80 sticky top-0 z-40 border-b backdrop-blur-md print:hidden">
+				<div class="mx-auto flex h-16 max-w-[1800px] items-center justify-between px-4 md:px-8">
+					<div class="flex items-center gap-4">
+						<Button.Root variant="ghost" size="icon" href="/dashboard" class="shrink-0">
+							<ArrowLeft size={24} />
+						</Button.Root>
+						<h1 class="hidden text-xl font-bold tracking-tight sm:block">
+							{id === 'new' ? 'Neue Rechnung' : `Rechnung bearbeiten`}
+						</h1>
+					</div>
+
+					<div class="flex items-center gap-2">
+						<button
+							onclick={handleDownloadXml}
+							class={cn(
+								'border-input bg-background hover:bg-accent hover:text-accent-foreground inline-flex h-9 items-center justify-center gap-2 rounded-lg border px-3 text-sm font-medium transition-all active:scale-95'
+							)}
+						>
+							<Download size={16} />
+							<span class="hidden md:inline">{m.preview_downloadXml()}</span>
+						</button>
+						<button
+							onclick={handlePrint}
+							class={cn(
+								'bg-primary text-primary-foreground shadow-primary/25 hover:bg-primary/90 inline-flex h-9 items-center justify-center gap-2 rounded-lg px-4 text-sm font-medium shadow-md transition-all active:scale-95'
+							)}
+						>
+							<Printer size={16} />
+							<span>{m.preview_savePdf()}</span>
+						</button>
+					</div>
+				</div>
+			</header>
 
 			<!-- Main Content -->
 			<main
@@ -96,12 +108,14 @@
 
 				<!-- Preview Column -->
 				<div
-					class="sticky top-24 max-h-[calc(100vh-7rem)] w-full overflow-auto lg:w-1/2 xl:w-7/12 print:static print:max-h-none print:w-full"
+					class="sticky top-24 max-h-[calc(100vh-8rem)] w-full overflow-auto lg:w-1/2 xl:w-7/12 print:static print:max-h-none print:w-full"
 				>
 					<div
-						class="bg-muted/30 flex justify-center rounded-xl p-4 backdrop-blur-sm print:bg-white print:p-0"
+						class="bg-muted/30 min-w-full rounded-xl p-4 backdrop-blur-sm print:bg-white print:p-0"
 					>
-						<InvoicePreview />
+						<div class="mx-auto w-[210mm] max-w-full lg:max-w-none">
+							<InvoicePreview />
+						</div>
 					</div>
 				</div>
 			</main>

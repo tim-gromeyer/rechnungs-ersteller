@@ -68,4 +68,28 @@ export interface Invoice {
 	settings: InvoiceSettings;
 
 	message?: string; // Custom message/note
+	title?: string; // Custom title for better overview
+	isPaid?: boolean; // Custom field for EÜR
+}
+
+export interface Expense {
+	id: string;
+	date: string; // ISO date format (YYYY-MM-DD)
+	amount: number;
+	description: string;
+	category: string;
+	receiptId?: string; // Links to a saved receipt
+}
+
+export interface OcrResult {
+	text?: string;
+	// Additional OCR metadata if needed
+}
+
+export interface Receipt {
+	id: string;
+	fileData: Blob; // Binary representation for efficient storage
+	fileName: string;
+	fileType: string;
+	dataUrl?: string; // Kept for backward compatibility with old data
 }

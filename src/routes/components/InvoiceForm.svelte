@@ -110,13 +110,13 @@
 						<Label.Root class="text-foreground text-sm font-medium">
 							{m.form_template()}
 						</Label.Root>
-						<div class="grid grid-cols-1 gap-4 md:grid-cols-2">
+						<div class="flex flex-col gap-3">
 							<!-- Kleinunternehmer -->
 							<Button.Root
 								type="button"
 								variant="outline"
 								class={cn(
-									'hover:border-primary/50 focus:ring-primary/20 relative z-10 flex h-auto cursor-pointer flex-col items-start gap-1 rounded-lg border p-4 text-left transition-all focus:ring-2 focus:outline-none',
+									'hover:border-primary/50 focus:ring-primary/20 flex min-h-[70px] w-full cursor-pointer flex-col items-start gap-1 rounded-lg border p-4 text-left transition-all focus:ring-2 focus:outline-none',
 									invoiceState.invoice.settings.template === 'kleinunternehmer'
 										? 'border-primary bg-primary/5'
 										: 'border-border bg-card'
@@ -124,14 +124,14 @@
 								onclick={() => handleTemplateChange('kleinunternehmer')}
 							>
 								<div class="flex w-full items-center justify-between">
-									<span class="font-semibold">{m.template_kleinunternehmer()}</span>
+									<span class="font-semibold break-words">{m.template_kleinunternehmer()}</span>
 									{#if invoiceState.invoice.settings.template === 'kleinunternehmer'}
-										<div class="bg-primary text-primary-foreground rounded-full p-0.5">
+										<div class="bg-primary text-primary-foreground shrink-0 rounded-full p-0.5">
 											<Check size={12} />
 										</div>
 									{/if}
 								</div>
-								<span class="text-muted-foreground text-xs">
+								<span class="text-muted-foreground text-[11px] leading-relaxed break-words">
 									{m.template_kleinunternehmer_description()}
 								</span>
 							</Button.Root>
@@ -141,7 +141,7 @@
 								type="button"
 								variant="outline"
 								class={cn(
-									'hover:border-primary/50 focus:ring-primary/20 relative z-10 flex h-auto cursor-pointer flex-col items-start gap-1 rounded-lg border p-4 text-left transition-all focus:ring-2 focus:outline-none',
+									'hover:border-primary/50 focus:ring-primary/20 flex min-h-[70px] w-full cursor-pointer flex-col items-start gap-1 rounded-lg border p-4 text-left transition-all focus:ring-2 focus:outline-none',
 									invoiceState.invoice.settings.template === 'default'
 										? 'border-primary bg-primary/5'
 										: 'border-border bg-card'
@@ -149,18 +149,29 @@
 								onclick={() => handleTemplateChange('default')}
 							>
 								<div class="flex w-full items-center justify-between">
-									<span class="font-semibold">{m.template_default()}</span>
+									<span class="font-semibold break-words">{m.template_default()}</span>
 									{#if invoiceState.invoice.settings.template === 'default'}
-										<div class="bg-primary text-primary-foreground rounded-full p-0.5">
+										<div class="bg-primary text-primary-foreground shrink-0 rounded-full p-0.5">
 											<Check size={12} />
 										</div>
 									{/if}
 								</div>
-								<span class="text-muted-foreground text-xs">
+								<span class="text-muted-foreground text-[11px] leading-relaxed break-words">
 									{m.template_default_description()}
 								</span>
 							</Button.Root>
 						</div>
+					</div>
+					<div class="space-y-2 md:col-span-2">
+						<Label.Root for="input-invoice-title" class="text-foreground text-sm font-medium">
+							Titel / Bezeichnung (intern)
+						</Label.Root>
+						<Input.Root
+							type="text"
+							id="input-invoice-title"
+							bind:value={invoiceState.invoice.title}
+							placeholder="z.B. Monatliche Wartung"
+						/>
 					</div>
 					<div class="space-y-2">
 						<Label.Root for="input-invoice-number" class="text-foreground text-sm font-medium">
