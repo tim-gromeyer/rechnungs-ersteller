@@ -292,7 +292,14 @@
 						<CardContent
 							class="text-muted-foreground flex flex-col items-center justify-center py-16"
 						>
-							<p>Keine Einträge für {selectedYear} gefunden.</p>
+							<div class="bg-muted mb-4 flex h-16 w-16 items-center justify-center rounded-full">
+								<FileText size={32} class="opacity-20" />
+							</div>
+							<p class="mb-6 font-medium">Keine Einträge für {selectedYear} gefunden.</p>
+							<Button onclick={handleCreateNew} variant="outline" size="sm">
+								<Plus class="mr-2" size={16} />
+								{m.dashboard_newInvoice()}
+							</Button>
 						</CardContent>
 					</Card>
 				{:else}

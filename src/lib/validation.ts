@@ -2,9 +2,9 @@ import { z } from 'zod';
 
 // Basic regex for IBAN and BIC. For production, consider a more robust library
 // that can validate based on country codes.
-const ibanRegex = /^[A-Z]{2}[0-9]{2}(?:[ ]?[0-9]{4}){4}(?:[ ]?[0-9]{1,2})?$/;
+const ibanRegex = /^[A-Z]{2}[0-9]{2}[A-Z0-9]{11,30}$/;
 const bicRegex = /^[A-Z]{6}[A-Z0-9]{2}([A-Z0-9]{3})?$/;
-const phoneRegex = /^[+]?[(]?[0-9]{3}[)]?[-\\s.]?[0-9]{3}[-\\s.]?[0-9]{4,6}$/; // Basic phone number regex
+const phoneRegex = /^\+?[0-9][0-9\s.-]{6,20}$/; // More flexible international phone regex
 
 import * as m from '$lib/paraglide/messages';
 
@@ -21,14 +21,35 @@ export function createInvoiceSchema() {
 
 	const contactInfoSchema = z.object({
 		email: z.string().email(m.validation_invalidEmail()).optional().or(z.literal('')),
-		phone: z.string().regex(phoneRegex, m.validation_invalidPhone()).optional().or(z.literal('')),
+		phone: z
+			.string()
+			.transform((val) => val.replace(/\s+/g, ''))
+			.refine((val) => !val || phoneRegex.test(val), {
+				message: m.validation_invalidPhone()
+			})
+			.optional()
+			.or(z.literal('')),
 		website: z.string().url(m.validation_invalidUrl()).optional().or(z.literal(''))
 	});
 
 	const bankDetailsSchema = z.object({
 		bankName: z.string().optional(),
-		iban: z.string().regex(ibanRegex, m.validation_invalidIban()).optional().or(z.literal('')),
-		bic: z.string().regex(bicRegex, m.validation_invalidBic()).optional().or(z.literal('')),
+		iban: z
+			.string()
+			.transform((val) => val.replace(/\s+/g, ''))
+			.refine((val) => !val || ibanRegex.test(val), {
+				message: m.validation_invalidIban()
+			})
+			.optional()
+			.or(z.literal('')),
+		bic: z
+			.string()
+			.transform((val) => val.replace(/\s+/g, ''))
+			.refine((val) => !val || bicRegex.test(val), {
+				message: m.validation_invalidBic()
+			})
+			.optional()
+			.or(z.literal('')),
 		taxId: z.string().optional(),
 		vatId: z.string().optional()
 	});

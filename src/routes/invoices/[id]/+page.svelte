@@ -27,6 +27,11 @@
 
 	onMount(async () => {
 		if (id) {
+			if (id === 'new') {
+				invoiceState.createNewInvoice();
+				loading = false;
+				return;
+			}
 			const loadedInvoice = await db.getInvoice(id);
 			if (loadedInvoice) {
 				invoiceState.invoice = loadedInvoice;
@@ -67,15 +72,12 @@
 		if (debounceTimer) clearTimeout(debounceTimer);
 	});
 
-	// Track if the current PDF is a full ZUGFeRD version or just a preview
-	let isFullPdf = $state(false);
-
 	// Trigger PDF regeneration whenever invoice changes
 	$effect(() => {
 		// Create a deep dependency by accessing the state
 		const data = invoiceState.invoice;
-		// Also track sub-properties if needed, but stringify is the safest deep-track
-		const _trigger = JSON.stringify(data);
+		// stringify is a reliable deep tracking method for reactive objects
+		void JSON.stringify(data);
 
 		if (!loading && pdfWorker) {
 			isGenerating = true;
@@ -91,7 +93,6 @@
 		if (!pdfWorker) return;
 
 		isGenerating = true;
-		isFullPdf = !previewOnly;
 
 		const translations = {
 			title: m.invoice_title(),
@@ -110,7 +111,10 @@
 			serviceDate: m.invoice_serviceDate(),
 			bank: m.invoice_bank(),
 			iban: m.invoice_iban(),
-			bic: m.invoice_bic()
+			bic: m.invoice_bic(),
+			phone: m.form_phone ? m.form_phone() : 'Phone',
+			email: m.form_email ? m.form_email() : 'Email',
+			website: m.form_website ? m.form_website() : 'Website'
 		};
 
 		pdfWorker.postMessage({

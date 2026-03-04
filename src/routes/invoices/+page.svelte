@@ -76,6 +76,18 @@
 		const totalVat = (subtotal - discountTotal) * (invoice.settings.vatRate / 100);
 		return subtotal - discountTotal + totalVat;
 	}
+
+	async function handleCreateNew() {
+		try {
+			const { invoiceState } = await import('$lib/state.svelte');
+			invoiceState.createNewInvoice();
+			const invoiceToSave = $state.snapshot(invoiceState.invoice);
+			await db.saveInvoice(invoiceToSave);
+			await goto(`/invoices/${invoiceState.invoice.id}`);
+		} catch (e) {
+			console.error('Error creating new invoice:', e);
+		}
+	}
 </script>
 
 <div class="container mx-auto max-w-6xl p-4 sm:p-8">
@@ -89,7 +101,7 @@
 				<p class="text-muted-foreground text-sm">Verwalte deine Rechnungen und Zahlungsstatus</p>
 			</div>
 		</div>
-		<Button href="/invoices/new" class="gap-2">
+		<Button onclick={handleCreateNew} class="gap-2">
 			<Plus size={18} />
 			{m.dashboard_newInvoice()}
 		</Button>
@@ -131,7 +143,7 @@
 						Erstelle deine erste Rechnung, um sie hier zu verwalten.
 					</p>
 				</div>
-				<Button href="/" variant="outline">Jetzt Rechnung schreiben</Button>
+				<Button onclick={handleCreateNew} variant="outline">Jetzt Rechnung schreiben</Button>
 			</div>
 		</Card>
 	{:else}

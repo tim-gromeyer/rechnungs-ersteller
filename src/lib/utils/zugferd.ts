@@ -64,6 +64,17 @@ export function generateZugferdXml(invoice: Invoice): string {
 							el('ram:CityName', sender.city),
 							el('ram:CountryID', sender.country || 'DE')
 						]),
+						container('ram:DefinedTradeContact', [
+							el('ram:PersonName', sender.name),
+							sender.phone
+								? container('ram:TelephoneUniversalCommunication', [
+										el('ram:CompleteNumber', sender.phone)
+									])
+								: undefined,
+							sender.email
+								? container('ram:EmailURIUniversalCommunication', [el('ram:URIID', sender.email)])
+								: undefined
+						]),
 						sender.taxId
 							? container('ram:SpecifiedTaxRegistration', [
 									el('ram:ID', sender.taxId, { schemeID: 'FC' })

@@ -513,6 +513,22 @@
 						{/if}
 					</div>
 					<div class="space-y-2">
+						<Label.Root for="input-sender-phone" class="text-foreground text-sm font-medium">
+							{m.form_phone()}
+						</Label.Root>
+						<Input.Root
+							type="text"
+							id="input-sender-phone"
+							bind:value={invoiceState.invoice.sender.phone}
+							class={getError('sender.phone') ? 'border-destructive' : ''}
+						/>
+						{#if getError('sender.phone')}
+							<p class="text-destructive text-sm font-medium">
+								{getError('sender.phone')}
+							</p>
+						{/if}
+					</div>
+					<div class="space-y-2">
 						<Label.Root for="input-sender-website" class="text-foreground text-sm font-medium">
 							{m.form_website()}
 						</Label.Root>

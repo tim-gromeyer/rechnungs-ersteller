@@ -43,6 +43,7 @@
 	"form_sender": "Sender (You)",
 	"form_contact": "Contact",
 	"form_email": "Email",
+	"form_phone": "Phone",
 	"form_website": "Website",
 	"form_bankTax": "Bank & Tax",
 	"form_bankName": "Bank Name",
