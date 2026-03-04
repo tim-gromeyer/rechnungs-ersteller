@@ -138,5 +138,10 @@
 	"settings_storage_invoices": "Invoices (Metadata)",
 	"settings_storage_expenses": "Expenses (Metadata)",
 	"settings_storage_receipts": "Receipts (Files)",
-	"settings_storage_overhead": "System & Indices"
+	"settings_storage_overhead": "System & Indices",
+	"settings_danger_zone": "Danger Zone",
+	"settings_delete_all_title": "Delete All Data",
+	"settings_delete_all_description": "Irrevocably deletes all invoices, expenses, and receipts from your browser storage.",
+	"settings_delete_all_confirm": "Are you absolutely sure? All your data will be deleted and cannot be restored without a backup.",
+	"settings_delete_all_success": "All data has been successfully deleted."
 }

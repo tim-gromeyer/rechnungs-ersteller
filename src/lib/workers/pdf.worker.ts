@@ -36,7 +36,11 @@ self.onmessage = async (e: MessageEvent<PdfWorkerData>) => {
 	}
 };
 
-async function generatePdf(invoice: Invoice, t: Record<string, string>, previewOnly: boolean = false): Promise<ArrayBuffer> {
+async function generatePdf(
+	invoice: Invoice,
+	t: Record<string, string>,
+	previewOnly: boolean = false
+): Promise<ArrayBuffer> {
 	const subtotal = calculateSubtotal(invoice.articles);
 	const discountTotal = calculateDiscountTotal(invoice.discounts);
 	const netTotal = calculateNetTotal(invoice.articles, invoice.discounts);
@@ -114,24 +118,36 @@ async function generatePdf(invoice: Invoice, t: Record<string, string>, previewO
 					stack: [
 						invoice.settings.logoPath
 							? {
-								image: invoice.settings.logoPath,
-								width: 90,
-								margin: [0, 0, 0, 0]
-							}
+									image: invoice.settings.logoPath,
+									width: 90,
+									margin: [0, 0, 0, 0]
+								}
 							: {
-								text: (invoice.sender.company || invoice.sender.name).toUpperCase(),
-								fontSize: 13,
-								bold: true,
-								color: '#1e3a8a',
-								characterSpacing: 0.5
-							}
+									text: (invoice.sender.company || invoice.sender.name).toUpperCase(),
+									fontSize: 13,
+									bold: true,
+									color: '#1e3a8a',
+									characterSpacing: 0.5
+								}
 					]
 				},
 				{
 					width: 'auto',
 					stack: [
-						{ text: invoice.sender.company || invoice.sender.name, bold: true, fontSize: 9, alignment: 'right' },
-						{ text: `${invoice.sender.street}\n${invoice.sender.zip} ${invoice.sender.city}`, alignment: 'right', color: '#4b5563', fontSize: 7.5, margin: [0, 1, 0, 0], lineHeight: 1.1 },
+						{
+							text: invoice.sender.company || invoice.sender.name,
+							bold: true,
+							fontSize: 9,
+							alignment: 'right'
+						},
+						{
+							text: `${invoice.sender.street}\n${invoice.sender.zip} ${invoice.sender.city}`,
+							alignment: 'right',
+							color: '#4b5563',
+							fontSize: 7.5,
+							margin: [0, 1, 0, 0],
+							lineHeight: 1.1
+						},
 						{
 							text: [
 								invoice.sender.phone ? `${invoice.sender.phone}  •  ` : '',
@@ -153,7 +169,13 @@ async function generatePdf(invoice: Invoice, t: Record<string, string>, previewO
 					width: '*',
 					stack: [
 						{ text: senderReturnAddress, fontSize: 6.5, color: '#6b7280', margin: [0, 0, 0, 10] },
-						{ text: invoice.customer.company || '', bold: true, fontSize: 9.5, color: '#000000', margin: [0, 0, 0, 1] },
+						{
+							text: invoice.customer.company || '',
+							bold: true,
+							fontSize: 9.5,
+							color: '#000000',
+							margin: [0, 0, 0, 1]
+						},
 						{ text: invoice.customer.name, fontSize: 9.5 },
 						{ text: invoice.customer.street, fontSize: 9.5 },
 						{ text: `${invoice.customer.zip} ${invoice.customer.city}`, fontSize: 9.5 }
@@ -166,9 +188,22 @@ async function generatePdf(invoice: Invoice, t: Record<string, string>, previewO
 							table: {
 								widths: ['*', 'auto'],
 								body: [
-									[{ text: t.number, color: '#4b5563', fontSize: 8 }, { text: invoice.number, fontSize: 8, alignment: 'right', bold: true }],
-									[{ text: t.date, color: '#4b5563', fontSize: 8 }, { text: formatDate(invoice.date, locale), fontSize: 8, alignment: 'right' }],
-									[{ text: t.serviceDate, color: '#4b5563', fontSize: 8 }, { text: formatDate(invoice.serviceDate, locale), fontSize: 8, alignment: 'right' }]
+									[
+										{ text: t.number, color: '#4b5563', fontSize: 8 },
+										{ text: invoice.number, fontSize: 8, alignment: 'right', bold: true }
+									],
+									[
+										{ text: t.date, color: '#4b5563', fontSize: 8 },
+										{ text: formatDate(invoice.date, locale), fontSize: 8, alignment: 'right' }
+									],
+									[
+										{ text: t.serviceDate, color: '#4b5563', fontSize: 8 },
+										{
+											text: formatDate(invoice.serviceDate, locale),
+											fontSize: 8,
+											alignment: 'right'
+										}
+									]
 								]
 							},
 							layout: 'noBorders',
@@ -190,7 +225,13 @@ async function generatePdf(invoice: Invoice, t: Record<string, string>, previewO
 	];
 
 	if (invoice.message) {
-		content.push({ text: invoice.message, fontSize: 9, color: '#374151', margin: [0, 0, 0, 25], lineHeight: 1.4 });
+		content.push({
+			text: invoice.message,
+			fontSize: 9,
+			color: '#374151',
+			margin: [0, 0, 0, 25],
+			lineHeight: 1.4
+		});
 	}
 
 	content.push({
@@ -200,9 +241,11 @@ async function generatePdf(invoice: Invoice, t: Record<string, string>, previewO
 			body: tableBody
 		},
 		layout: {
-			hLineWidth: (i: any, node: any) => (i === 0 || i === 1 || i === node.table.body.length ? 1 : 0),
+			hLineWidth: (i: any, node: any) =>
+				i === 0 || i === 1 || i === node.table.body.length ? 1 : 0,
 			vLineWidth: () => 0,
-			hLineColor: (i: any, node: any) => (i === 0 || i === node.table.body.length ? '#000000' : '#f3f4f6'),
+			hLineColor: (i: any, node: any) =>
+				i === 0 || i === node.table.body.length ? '#000000' : '#f3f4f6',
 			paddingTop: (i: any) => 6,
 			paddingBottom: (i: any) => 6,
 			fillColor: (i: any) => (i === 0 ? '#f9fafb' : null)
@@ -212,21 +255,44 @@ async function generatePdf(invoice: Invoice, t: Record<string, string>, previewO
 
 	// TOTALS TABLE (Alinged with the article table)
 	const totalsBody: any[][] = [
-		[{ text: t.subtotal, color: '#4b5563' }, { text: formatCurrency(subtotal, currency, locale), alignment: 'right' }]
+		[
+			{ text: t.subtotal, color: '#4b5563' },
+			{ text: formatCurrency(subtotal, currency, locale), alignment: 'right' }
+		]
 	];
 
 	if (discountTotal > 0) {
-		totalsBody.push([{ text: t.discount, color: '#4b5563' }, { text: '-' + formatCurrency(discountTotal, currency, locale), alignment: 'right', color: '#166534' }]);
+		totalsBody.push([
+			{ text: t.discount, color: '#4b5563' },
+			{
+				text: '-' + formatCurrency(discountTotal, currency, locale),
+				alignment: 'right',
+				color: '#166534'
+			}
+		]);
 	}
 
 	if (!isKleinunternehmer) {
-		totalsBody.push([{ text: t.net, bold: true }, { text: formatCurrency(netTotal, currency, locale), alignment: 'right', bold: true }]);
-		totalsBody.push([{ text: t.plusVat, color: '#4b5563', fontSize: 8 }, { text: formatCurrency(vatTotal, currency, locale), alignment: 'right', fontSize: 8 }]);
+		totalsBody.push([
+			{ text: t.net, bold: true },
+			{ text: formatCurrency(netTotal, currency, locale), alignment: 'right', bold: true }
+		]);
+		totalsBody.push([
+			{ text: t.plusVat, color: '#4b5563', fontSize: 8 },
+			{ text: formatCurrency(vatTotal, currency, locale), alignment: 'right', fontSize: 8 }
+		]);
 	}
 
 	totalsBody.push([
 		{ text: t.gross, bold: true, fontSize: 11, margin: [0, 5, 0, 0] },
-		{ text: formatCurrency(grossTotal, currency, locale), alignment: 'right', bold: true, fontSize: 13, color: '#1d4ed8', margin: [0, 5, 0, 0] }
+		{
+			text: formatCurrency(grossTotal, currency, locale),
+			alignment: 'right',
+			bold: true,
+			fontSize: 13,
+			color: '#1d4ed8',
+			margin: [0, 5, 0, 0]
+		}
 	]);
 
 	content.push({
@@ -246,18 +312,71 @@ async function generatePdf(invoice: Invoice, t: Record<string, string>, previewO
 
 	const footerStack: any[] = [];
 	if (invoice.settings.paymentText) {
-		footerStack.push({ text: invoice.settings.paymentText, margin: [0, 0, 0, 15], color: '#111827', fontSize: 9 });
+		footerStack.push({
+			text: invoice.settings.paymentText,
+			margin: [0, 0, 0, 15],
+			color: '#111827',
+			fontSize: 9
+		});
 	}
 	if (isKleinunternehmer && invoice.settings.taxNote) {
-		footerStack.push({ text: invoice.settings.taxNote, italics: true, color: '#4b5563', fontSize: 7.5, margin: [0, 0, 0, 20] });
+		footerStack.push({
+			text: invoice.settings.taxNote,
+			italics: true,
+			color: '#4b5563',
+			fontSize: 7.5,
+			margin: [0, 0, 0, 20]
+		});
 	}
-	footerStack.push({ canvas: [{ type: 'line', x1: 0, y1: 0, x2: 515, y2: 0, lineWidth: 0.5, lineColor: '#e5e7eb' }], margin: [0, 15, 0, 15] });
+	footerStack.push({
+		canvas: [{ type: 'line', x1: 0, y1: 0, x2: 515, y2: 0, lineWidth: 0.5, lineColor: '#e5e7eb' }],
+		margin: [0, 15, 0, 15]
+	});
 	footerStack.push({
 		columns: [
-			{ width: '*', stack: [{ text: t.bank.toUpperCase(), fontSize: 6.5, bold: true, color: '#9ca3af', margin: [0, 0, 0, 2] }, { text: invoice.sender.bankName || '-', fontSize: 7.5, color: '#374151' }] },
-			{ width: '*', stack: [{ text: 'IBAN', fontSize: 6.5, bold: true, color: '#9ca3af', margin: [0, 0, 0, 2] }, { text: invoice.sender.iban || '-', fontSize: 7.5, color: '#374151' }] },
-			{ width: '*', stack: [{ text: 'BIC', fontSize: 6.5, bold: true, color: '#9ca3af', margin: [0, 0, 0, 2] }, { text: invoice.sender.bic || '-', fontSize: 7.5, color: '#374151' }] },
-			{ width: '*', stack: [{ text: t.taxId.toUpperCase(), fontSize: 6.5, bold: true, color: '#9ca3af', margin: [0, 0, 0, 2] }, { text: invoice.sender.taxId || '-', fontSize: 7.5, color: '#374151' }, invoice.sender.vatId ? { text: `USt-Id: ${invoice.sender.vatId}`, fontSize: 7.5, color: '#374151' } : { text: '', fontSize: 0 }] }
+			{
+				width: '*',
+				stack: [
+					{
+						text: t.bank.toUpperCase(),
+						fontSize: 6.5,
+						bold: true,
+						color: '#9ca3af',
+						margin: [0, 0, 0, 2]
+					},
+					{ text: invoice.sender.bankName || '-', fontSize: 7.5, color: '#374151' }
+				]
+			},
+			{
+				width: '*',
+				stack: [
+					{ text: 'IBAN', fontSize: 6.5, bold: true, color: '#9ca3af', margin: [0, 0, 0, 2] },
+					{ text: invoice.sender.iban || '-', fontSize: 7.5, color: '#374151' }
+				]
+			},
+			{
+				width: '*',
+				stack: [
+					{ text: 'BIC', fontSize: 6.5, bold: true, color: '#9ca3af', margin: [0, 0, 0, 2] },
+					{ text: invoice.sender.bic || '-', fontSize: 7.5, color: '#374151' }
+				]
+			},
+			{
+				width: '*',
+				stack: [
+					{
+						text: t.taxId.toUpperCase(),
+						fontSize: 6.5,
+						bold: true,
+						color: '#9ca3af',
+						margin: [0, 0, 0, 2]
+					},
+					{ text: invoice.sender.taxId || '-', fontSize: 7.5, color: '#374151' },
+					invoice.sender.vatId
+						? { text: `USt-Id: ${invoice.sender.vatId}`, fontSize: 7.5, color: '#374151' }
+						: { text: '', fontSize: 0 }
+				]
+			}
 		]
 	});
 
@@ -277,7 +396,6 @@ async function generatePdf(invoice: Invoice, t: Record<string, string>, previewO
 		defaultStyle: { fontSize: 9, font: 'Roboto', color: '#374151', lineHeight: 1.2 }
 	};
 
-
 	const pdfDocGenerator = pdfMakeInstance.createPdf(docDefinition);
 	let pdfMakeBuffer: ArrayBuffer;
 	try {
@@ -286,7 +404,10 @@ async function generatePdf(invoice: Invoice, t: Record<string, string>, previewO
 			pdfMakeBuffer = await blob.arrayBuffer();
 		} else if (typeof (pdfDocGenerator as any).getBuffer === 'function') {
 			const buffer = await (pdfDocGenerator as any).getBuffer();
-			pdfMakeBuffer = new Uint8Array(buffer).buffer.slice(buffer.byteOffset, buffer.byteOffset + buffer.byteLength);
+			pdfMakeBuffer = new Uint8Array(buffer).buffer.slice(
+				buffer.byteOffset,
+				buffer.byteOffset + buffer.byteLength
+			);
 		} else {
 			throw new Error('pdfDocGenerator error');
 		}
@@ -308,5 +429,8 @@ async function generatePdf(invoice: Invoice, t: Record<string, string>, previewO
 		modificationDate: new Date()
 	});
 	const finalPdfBytes = await pdfDoc.save();
-	return finalPdfBytes.buffer.slice(finalPdfBytes.byteOffset, finalPdfBytes.byteOffset + finalPdfBytes.byteLength) as ArrayBuffer;
+	return finalPdfBytes.buffer.slice(
+		finalPdfBytes.byteOffset,
+		finalPdfBytes.byteOffset + finalPdfBytes.byteLength
+	) as ArrayBuffer;
 }

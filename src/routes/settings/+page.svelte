@@ -15,12 +15,15 @@
 	import { db } from '$lib/db';
 	import { getStorageEstimate, formatBytes } from '$lib/utils/storage';
 	import { onMount } from 'svelte';
+	import { Trash2, AlertTriangle } from 'lucide-svelte';
 
 	let fileInput: HTMLInputElement;
 	let isImporting = $state(false);
 
 	let importConfirmOpen = $state(false);
 	let pendingImportFile = $state<File | null>(null);
+
+	let deleteConfirmOpen = $state(false);
 
 	let infoDialogOpen = $state(false);
 	let infoTitle = $state('');
@@ -30,9 +33,13 @@
 	let storeSizes = $state<Record<string, number>>({});
 
 	onMount(async () => {
+		await refreshStorageInfo();
+	});
+
+	async function refreshStorageInfo() {
 		storageInfo = await getStorageEstimate();
 		storeSizes = await db.getStoreSizes();
-	});
+	}
 
 	function showInfo(title: string, description: string) {
 		infoTitle = title;
@@ -75,6 +82,19 @@
 		} finally {
 			isImporting = false;
 			pendingImportFile = null;
+		}
+	}
+
+	async function handleDeleteAll() {
+		try {
+			await db.clearAllData();
+			await refreshStorageInfo();
+			showInfo(m.settings_delete_all_title(), m.settings_delete_all_success());
+		} catch (e) {
+			console.error('Delete all failed:', e);
+			showInfo(m.settings_delete_all_title(), 'Fehler beim Löschen der Daten.');
+		} finally {
+			deleteConfirmOpen = false;
 		}
 	}
 </script>
@@ -207,6 +227,25 @@
 				{/if}
 			</CardContent>
 		</Card>
+
+		<!-- Danger Zone -->
+		<Card class="border-destructive/50">
+			<CardHeader>
+				<CardTitle class="text-destructive flex items-center gap-2">
+					<AlertTriangle size={20} />
+					{m.settings_danger_zone()}
+				</CardTitle>
+				<CardDescription>
+					{m.settings_delete_all_description()}
+				</CardDescription>
+			</CardHeader>
+			<CardContent>
+				<Button variant="destructive" onclick={() => (deleteConfirmOpen = true)}>
+					<Trash2 size={16} class="mr-2" />
+					{m.settings_delete_all_title()}
+				</Button>
+			</CardContent>
+		</Card>
 	</div>
 </div>
 
@@ -218,6 +257,16 @@
 	confirmVariant="default"
 	onConfirm={executeImport}
 	onCancel={() => (importConfirmOpen = false)}
+/>
+
+<ConfirmDialog
+	bind:open={deleteConfirmOpen}
+	title={m.settings_delete_all_title()}
+	description={m.settings_delete_all_confirm()}
+	confirmText={m.common_delete()}
+	confirmVariant="destructive"
+	onConfirm={handleDeleteAll}
+	onCancel={() => (deleteConfirmOpen = false)}
 />
 
 <Dialog.Root bind:open={infoDialogOpen}>

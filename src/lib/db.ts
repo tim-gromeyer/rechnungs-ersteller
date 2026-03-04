@@ -206,6 +206,20 @@ export const db = {
 		});
 	},
 
+	async clearAllData(): Promise<void> {
+		const db = await this.initDB();
+		const storeNames = [STORE_INVOICES, STORE_EXPENSES, STORE_RECEIPTS, STORE_SETTINGS];
+		return new Promise((resolve, reject) => {
+			const transaction = db.transaction(storeNames, 'readwrite');
+			transaction.onerror = () => reject(transaction.error);
+			transaction.oncomplete = () => resolve();
+
+			storeNames.forEach((name) => {
+				transaction.objectStore(name).clear();
+			});
+		});
+	},
+
 	async getStoreSizes(): Promise<Record<string, number>> {
 		const db = await this.initDB();
 		const storeNames = [STORE_INVOICES, STORE_EXPENSES, STORE_RECEIPTS];

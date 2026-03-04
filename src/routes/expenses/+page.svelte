@@ -19,7 +19,7 @@
 	let selectedYear = $state<number>(new Date().getFullYear());
 
 	let expenses = $derived(
-		allExpenses.filter((e) => new Date(e.date).getFullYear() === selectedYear)
+		allExpenses.filter((e) => new Date(e.date).getFullYear() === Number(selectedYear))
 	);
 
 	let availableYears = $derived.by(() => {
@@ -76,28 +76,26 @@
 	}
 
 	async function loadData() {
-		allExpenses = await db.getAllExpenses();
-		allExpenses.sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
-
-		// Load receipts in parallel
-		const receipts: Record<string, Receipt> = {};
-		await Promise.all(
-			expenses.map(async (expense) => {
-				if (expense.receiptIds && expense.receiptIds.length > 0) {
-					await Promise.all(
-						expense.receiptIds.map(async (receiptId) => {
-							const receipt = await db.getReceipt(receiptId);
-							if (receipt) {
-								receipts[receiptId] = receipt;
-								await getDisplayUrl(receipt);
-							}
-						})
-					);
-				}
-			})
-		);
-		receiptsMap = receipts;
+		const data = await db.getAllExpenses();
+		allExpenses = data.sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
 	}
+
+	// Reaktiv die Belege laden, wenn sich die gefilterten Ausgaben ändern
+	$effect(() => {
+		expenses.forEach(async (expense) => {
+			if (expense.receiptIds) {
+				for (const rid of expense.receiptIds) {
+					if (!receiptsMap[rid]) {
+						const receipt = await db.getReceipt(rid);
+						if (receipt) {
+							receiptsMap[rid] = receipt;
+							await getDisplayUrl(receipt);
+						}
+					}
+				}
+			}
+		});
+	});
 
 	function handleFileSelect(event: Event) {
 		const target = event.target as HTMLInputElement;
@@ -239,7 +237,7 @@
 
 	async function handleDelete() {
 		if (expenseToDelete) {
-			const expense = expenses.find((e) => e.id === expenseToDelete);
+			const expense = allExpenses.find((e) => e.id === expenseToDelete);
 			if (expense?.receiptIds) {
 				for (const id of expense.receiptIds) {
 					await db.deleteReceipt(id);
@@ -499,7 +497,7 @@
 									<Button
 										variant="ghost"
 										size="icon"
-										class="h-8 w-8 text-destructive"
+										class="text-destructive h-8 w-8"
 										onclick={(e) => {
 											e.stopPropagation();
 											removeExistingReceipt(rid);
@@ -513,8 +511,10 @@
 					{/if}
 
 					<!-- Newly selected files -->
-					{#each selectedFiles as file, index}
-						<div class="bg-blue-50 dark:bg-blue-900/20 flex items-center justify-between rounded-md p-2 text-sm">
+					{#each selectedFiles as file, index (index)}
+						<div
+							class="flex items-center justify-between rounded-md bg-blue-50 p-2 text-sm dark:bg-blue-900/20"
+						>
 							<div class="flex items-center gap-2 truncate">
 								{#if file.type.startsWith('image/')}
 									<ImageIcon size={16} class="shrink-0" />
@@ -529,7 +529,7 @@
 							<Button
 								variant="ghost"
 								size="icon"
-								class="h-8 w-8 text-destructive"
+								class="text-destructive h-8 w-8"
 								onclick={(e) => {
 									e.stopPropagation();
 									removeSelectedFile(index);

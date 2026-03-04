@@ -6,34 +6,52 @@ export interface BackupData {
 	date: string;
 	invoices: Invoice[];
 	expenses: Expense[];
-	receipts: Receipt[];
-	// We could export settings too, but let's stick to the core data
+	receipts: (Omit<Receipt, 'fileData'> & { fileData?: string })[]; // Store Blob as base64 string
+}
+
+async function blobToBase64(blob: Blob): Promise<string> {
+	return new Promise((resolve, reject) => {
+		const reader = new FileReader();
+		reader.onloadend = () => resolve(reader.result as string);
+		reader.onerror = reject;
+		reader.readAsDataURL(blob);
+	});
+}
+
+async function base64ToBlob(base64: string): Promise<Blob> {
+	const res = await fetch(base64);
+	return await res.blob();
 }
 
 export async function exportDatabase(): Promise<void> {
 	const invoices = await db.getAllInvoices();
 	const expenses = await db.getAllExpenses();
 
-	// Fetch all receipts
-	const receipts: Receipt[] = [];
-	for (const expense of expenses) {
-		if (expense.receiptIds && expense.receiptIds.length > 0) {
-			for (const receiptId of expense.receiptIds) {
-				const receipt = await db.getReceipt(receiptId);
-				if (receipt) receipts.push(receipt);
-			}
+	// Fetch all receipts and convert Blobs to base64
+	const receipts: (Omit<Receipt, 'fileData'> & { fileData?: string })[] = [];
+	const allReceiptIds = new Set<string>();
+	expenses.forEach((e) => e.receiptIds?.forEach((id) => allReceiptIds.add(id)));
+
+	for (const receiptId of Array.from(allReceiptIds)) {
+		const receipt = await db.getReceipt(receiptId);
+		if (receipt) {
+			const { fileData, ...rest } = receipt;
+			receipts.push({
+				...rest,
+				fileData: fileData ? await blobToBase64(fileData) : undefined
+			});
 		}
 	}
 
 	const backup: BackupData = {
-		version: 1,
+		version: 2, // Increment version
 		date: new Date().toISOString(),
 		invoices,
 		expenses,
 		receipts
 	};
 
-	const blob = new Blob([JSON.stringify(backup, null, 2)], { type: 'application/json' });
+	const blob = new Blob([JSON.stringify(backup)], { type: 'application/json' });
 	const url = URL.createObjectURL(blob);
 	const link = document.createElement('a');
 	link.href = url;
@@ -64,7 +82,11 @@ export async function importDatabase(file: File): Promise<void> {
 					await db.saveExpense(expense);
 				}
 				if (backup.receipts) {
-					for (const receipt of backup.receipts) {
+					for (const r of backup.receipts) {
+						const receipt: Receipt = {
+							...r,
+							fileData: r.fileData ? await base64ToBlob(r.fileData) : new Blob()
+						};
 						await db.saveReceipt(receipt);
 					}
 				}

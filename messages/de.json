@@ -140,5 +140,10 @@
 	"settings_storage_invoices": "Rechnungen (Metadaten)",
 	"settings_storage_expenses": "Ausgaben (Metadaten)",
 	"settings_storage_receipts": "Belege (Dateien)",
-	"settings_storage_overhead": "System & Indizes"
+	"settings_storage_overhead": "System & Indizes",
+	"settings_danger_zone": "Gefahrenbereich",
+	"settings_delete_all_title": "Alle Daten löschen",
+	"settings_delete_all_description": "Löscht unwiderruflich alle Rechnungen, Ausgaben und Belege aus dem Browser-Speicher.",
+	"settings_delete_all_confirm": "Bist du absolut sicher? Alle deine Daten werden gelöscht und können ohne Backup nicht wiederhergestellt werden.",
+	"settings_delete_all_success": "Alle Daten wurden erfolgreich gelöscht."
 }

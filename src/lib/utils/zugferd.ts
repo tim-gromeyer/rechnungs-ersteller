@@ -66,13 +66,13 @@ export function generateZugferdXml(invoice: Invoice): string {
 						]),
 						sender.taxId
 							? container('ram:SpecifiedTaxRegistration', [
-								el('ram:ID', sender.taxId, { schemeID: 'FC' })
-							])
+									el('ram:ID', sender.taxId, { schemeID: 'FC' })
+								])
 							: undefined,
 						sender.vatId
 							? container('ram:SpecifiedTaxRegistration', [
-								el('ram:ID', sender.vatId, { schemeID: 'VA' })
-							])
+									el('ram:ID', sender.vatId, { schemeID: 'VA' })
+								])
 							: undefined
 					]),
 					container('ram:BuyerTradeParty', [
@@ -88,7 +88,9 @@ export function generateZugferdXml(invoice: Invoice): string {
 				container('ram:ApplicableHeaderTradeDelivery', [
 					container('ram:ActualDeliverySupplyChainEvent', [
 						container('ram:OccurrenceDateTime', [
-							el('udt:DateTimeString', (invoice.serviceDate || date).replace(/-/g, ''), { format: '102' })
+							el('udt:DateTimeString', (invoice.serviceDate || date).replace(/-/g, ''), {
+								format: '102'
+							})
 						])
 					])
 				]),
