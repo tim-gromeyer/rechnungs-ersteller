@@ -96,7 +96,7 @@ export function createExpenseSchema() {
 		amount: z.number().positive(m.validation_amountPositive()),
 		description: z.string().min(1, m.validation_descriptionRequired()),
 		category: z.string().min(1, m.validation_categoryRequired()),
-		receiptId: z.string().optional()
+		receiptIds: z.array(z.string()).optional()
 	});
 
 	return { expenseSchema };

@@ -37,15 +37,16 @@
 		date: new Date().toISOString().split('T')[0],
 		amount: 0,
 		description: '',
-		category: ''
+		category: '',
+		receiptIds: []
 	});
-	let selectedFile = $state<File | null>(null);
+	let selectedFiles = $state<File[]>([]);
 	let isUploading = $state(false);
 
 	let deleteDialogOpen = $state(false);
 	let expenseToDelete = $state<string | null>(null);
 
-	let receiptToDelete = $state<boolean>(false); // Flag if the existing receipt should be deleted during edit
+	let receiptsToDelete = $state<string[]>([]); // List of receipt IDs to delete during edit
 
 	let previewDialogOpen = $state(false);
 	let previewReceipt = $state<Receipt | null>(null);
@@ -82,12 +83,16 @@
 		const receipts: Record<string, Receipt> = {};
 		await Promise.all(
 			expenses.map(async (expense) => {
-				if (expense.receiptId) {
-					const receipt = await db.getReceipt(expense.receiptId);
-					if (receipt) {
-						receipts[expense.receiptId] = receipt;
-						await getDisplayUrl(receipt);
-					}
+				if (expense.receiptIds && expense.receiptIds.length > 0) {
+					await Promise.all(
+						expense.receiptIds.map(async (receiptId) => {
+							const receipt = await db.getReceipt(receiptId);
+							if (receipt) {
+								receipts[receiptId] = receipt;
+								await getDisplayUrl(receipt);
+							}
+						})
+					);
 				}
 			})
 		);
@@ -97,14 +102,14 @@
 	function handleFileSelect(event: Event) {
 		const target = event.target as HTMLInputElement;
 		if (target.files && target.files.length > 0) {
-			selectedFile = target.files[0];
+			selectedFiles = [...selectedFiles, ...Array.from(target.files)];
 		}
 	}
 
 	function handleDrop(event: DragEvent) {
 		event.preventDefault();
 		if (event.dataTransfer?.files && event.dataTransfer.files.length > 0) {
-			selectedFile = event.dataTransfer.files[0];
+			selectedFiles = [...selectedFiles, ...Array.from(event.dataTransfer.files)];
 		}
 	}
 
@@ -120,15 +125,18 @@
 	function editExpense(expense: Expense) {
 		newExpense = { ...expense };
 		isEditing = true;
-		selectedFile = null;
-		receiptToDelete = false;
+		selectedFiles = [];
+		receiptsToDelete = [];
 		expenseState.resetValidation();
 		isAddDialogOpen = true;
 	}
 
-	function removeCurrentReceipt() {
-		receiptToDelete = true;
-		selectedFile = null;
+	function removeExistingReceipt(receiptId: string) {
+		receiptsToDelete = [...receiptsToDelete, receiptId];
+	}
+
+	function removeSelectedFile(index: number) {
+		selectedFiles = selectedFiles.filter((_, i) => i !== index);
 	}
 
 	async function handleSaveExpense() {
@@ -138,45 +146,44 @@
 
 		isUploading = true;
 		try {
-			let receiptId = newExpense.receiptId;
+			let currentReceiptIds = [...(newExpense.receiptIds || [])];
 
-			// Handle removal of existing receipt
-			if (isEditing && receiptToDelete && receiptId) {
-				await db.deleteReceipt(receiptId);
-				receiptId = undefined;
+			// Handle removal of existing receipts marked for deletion
+			if (isEditing && receiptsToDelete.length > 0) {
+				for (const id of receiptsToDelete) {
+					await db.deleteReceipt(id);
+					currentReceiptIds = currentReceiptIds.filter((rid) => rid !== id);
+				}
 			}
 
-			if (selectedFile) {
-				// Delete old receipt if replacing during edit (if not already handled by receiptToDelete)
-				if (isEditing && receiptId && !receiptToDelete) {
-					await db.deleteReceipt(receiptId);
+			// Handle new files
+			if (selectedFiles.length > 0) {
+				for (const file of selectedFiles) {
+					const receiptId = crypto.randomUUID();
+					let fileData: Blob;
+					let fileType = file.type;
+
+					if (file.type.startsWith('image/')) {
+						fileData = await compressImageToBlob(file);
+						fileType = 'image/jpeg';
+					} else {
+						fileData = file;
+					}
+
+					const compressedData = await gzipBlob(fileData);
+					const receipt: Receipt = {
+						id: receiptId,
+						fileName: file.name,
+						fileType: fileType,
+						fileData: compressedData
+					};
+					await db.saveReceipt(receipt);
+					currentReceiptIds.push(receiptId);
+
+					// Update local map and create URL for preview
+					receiptsMap[receiptId] = receipt;
+					await getDisplayUrl(receipt);
 				}
-
-				receiptId = crypto.randomUUID();
-				let fileData: Blob;
-				let fileType = selectedFile.type;
-
-				if (selectedFile.type.startsWith('image/')) {
-					fileData = await compressImageToBlob(selectedFile);
-					fileType = 'image/jpeg'; // compressImageToBlob uses image/jpeg
-				} else {
-					fileData = selectedFile;
-				}
-
-				// Apply Gzip compression
-				const compressedData = await gzipBlob(fileData);
-
-				const receipt: Receipt = {
-					id: receiptId,
-					fileName: selectedFile.name,
-					fileType: fileType,
-					fileData: compressedData
-				};
-				await db.saveReceipt(receipt);
-
-				// Update local map and create URL for preview
-				receiptsMap[receiptId] = receipt;
-				await getDisplayUrl(receipt);
 			}
 
 			const expense: Expense = {
@@ -190,14 +197,12 @@
 						return now.toISOString();
 					}
 
-					// If editing and same day, keep old time if possible (not trivial here without full existing object)
-					// For simplicity: if today, use full iso. If not today, use start of day.
 					return new Date(selectedDate).toISOString();
 				})(),
 				amount: Number(newExpense.amount),
 				description: newExpense.description!,
 				category: newExpense.category!,
-				receiptId
+				receiptIds: currentReceiptIds
 			};
 
 			await db.saveExpense(expense);
@@ -206,14 +211,15 @@
 			// Reset form
 			isAddDialogOpen = false;
 			isEditing = false;
-			receiptToDelete = false;
+			receiptsToDelete = [];
 			newExpense = {
 				date: new Date().toISOString().split('T')[0],
 				amount: 0,
 				description: '',
-				category: ''
+				category: '',
+				receiptIds: []
 			};
-			selectedFile = null;
+			selectedFiles = [];
 		} catch (error) {
 			console.error('Fehler beim Speichern der Ausgabe:', error);
 			alert('Fehler beim Speichern der Ausgabe.');
@@ -234,8 +240,10 @@
 	async function handleDelete() {
 		if (expenseToDelete) {
 			const expense = expenses.find((e) => e.id === expenseToDelete);
-			if (expense?.receiptId) {
-				await db.deleteReceipt(expense.receiptId);
+			if (expense?.receiptIds) {
+				for (const id of expense.receiptIds) {
+					await db.deleteReceipt(id);
+				}
 			}
 			await db.deleteExpense(expenseToDelete);
 			await loadData();
@@ -313,33 +321,37 @@
 								<Table.Cell>{expense.description}</Table.Cell>
 								<Table.Cell>{expense.category}</Table.Cell>
 								<Table.Cell>
-									{#if expense.receiptId && receiptsMap[expense.receiptId]}
-										{#if receiptsMap[expense.receiptId].fileType.startsWith('image/')}
-											<button
-												onclick={() => openPreview(receiptsMap[expense.receiptId!])}
-												class="flex items-center text-blue-500 transition-opacity hover:opacity-80"
-											>
-												<img
-													src={objectUrls[expense.receiptId] ||
-														receiptsMap[expense.receiptId].dataUrl}
-													alt="Receipt"
-													class="h-10 w-10 rounded border object-cover shadow-sm"
-												/>
-											</button>
+									<div class="flex flex-wrap gap-2">
+										{#if expense.receiptIds && expense.receiptIds.length > 0}
+											{#each expense.receiptIds as rid (rid)}
+												{#if receiptsMap[rid]}
+													{#if receiptsMap[rid].fileType.startsWith('image/')}
+														<button
+															onclick={() => openPreview(receiptsMap[rid])}
+															class="flex items-center text-blue-500 transition-opacity hover:opacity-80"
+															title={receiptsMap[rid].fileName}
+														>
+															<img
+																src={objectUrls[rid] || receiptsMap[rid].dataUrl}
+																alt="Receipt"
+																class="h-10 w-10 rounded border object-cover shadow-sm"
+															/>
+														</button>
+													{:else}
+														<button
+															onclick={() => openPreview(receiptsMap[rid])}
+															class="flex items-center gap-1 text-blue-500 hover:underline"
+															title={receiptsMap[rid].fileName}
+														>
+															<FileText size={20} />
+														</button>
+													{/if}
+												{/if}
+											{/each}
 										{:else}
-											<button
-												onclick={() => openPreview(receiptsMap[expense.receiptId!])}
-												class="flex items-center gap-1 text-blue-500 hover:underline"
-											>
-												<FileText size={20} />
-												<span class="max-w-[100px] truncate text-xs"
-													>{receiptsMap[expense.receiptId].fileName}</span
-												>
-											</button>
+											<span class="text-muted-foreground text-sm">-</span>
 										{/if}
-									{:else}
-										<span class="text-muted-foreground text-sm">-</span>
-									{/if}
+									</div>
 								</Table.Cell>
 								<Table.Cell class="text-right font-medium text-red-600">
 									-{formatCurrency(expense.amount)}
@@ -446,7 +458,7 @@
 			</div>
 
 			<div class="space-y-2">
-				<Label>Beleg (Drag & Drop)</Label>
+				<Label>Belege (Drag & Drop)</Label>
 				<div
 					role="button"
 					tabindex="0"
@@ -460,58 +472,73 @@
 						id="file-upload"
 						type="file"
 						accept="image/*,application/pdf"
+						multiple
 						class="hidden"
 						onchange={handleFileSelect}
 					/>
-					{#if selectedFile}
-						<div class="text-foreground flex items-center gap-2 font-medium">
-							{#if selectedFile.type.startsWith('image/')}
-								<ImageIcon size={20} />
-							{:else}
-								<FileText size={20} />
+					<ImageIcon size={32} class="mb-2 opacity-50" />
+					<p class="text-sm">Klicke oder ziehe Dateien hierher</p>
+					<p class="mt-1 text-xs">PNG, JPG oder PDF (Max. empfohlen: 5MB)</p>
+				</div>
+
+				<!-- List of already uploaded and newly selected files -->
+				<div class="mt-4 space-y-2">
+					<!-- Existing files -->
+					{#if isEditing && newExpense.receiptIds}
+						{#each newExpense.receiptIds as rid (rid)}
+							{#if !receiptsToDelete.includes(rid) && receiptsMap[rid]}
+								<div class="bg-muted/30 flex items-center justify-between rounded-md p-2 text-sm">
+									<div class="flex items-center gap-2 truncate">
+										{#if receiptsMap[rid].fileType.startsWith('image/')}
+											<ImageIcon size={16} class="shrink-0" />
+										{:else}
+											<FileText size={16} class="shrink-0" />
+										{/if}
+										<span class="truncate">{receiptsMap[rid].fileName}</span>
+									</div>
+									<Button
+										variant="ghost"
+										size="icon"
+										class="h-8 w-8 text-destructive"
+										onclick={(e) => {
+											e.stopPropagation();
+											removeExistingReceipt(rid);
+										}}
+									>
+										<Trash2 size={14} />
+									</Button>
+								</div>
 							{/if}
-							<span>{selectedFile.name}</span>
-						</div>
-						<p class="mt-1 text-xs">{(selectedFile.size / 1024 / 1024).toFixed(2)} MB</p>
-					{:else if isEditing && newExpense.receiptId && receiptsMap[newExpense.receiptId] && !receiptToDelete}
-						<!-- Show existing file info if editing and there's a file saved and not marked for deletion -->
-						<div class="text-foreground flex flex-col items-center gap-4 font-medium">
-							<div class="flex items-center gap-2">
-								{#if receiptsMap[newExpense.receiptId].fileType.startsWith('image/')}
-									<ImageIcon size={20} />
-								{:else}
-									<FileText size={20} />
-								{/if}
-								<span>{receiptsMap[newExpense.receiptId].fileName}</span>
-							</div>
-							<div class="flex gap-2">
-								<Button
-									variant="secondary"
-									size="sm"
-									onclick={(e) => {
-										e.stopPropagation();
-										document.getElementById('file-upload')?.click();
-									}}
-								>
-									Ändern
-								</Button>
-								<Button
-									variant="destructive"
-									size="sm"
-									onclick={(e) => {
-										e.stopPropagation();
-										removeCurrentReceipt();
-									}}
-								>
-									Entfernen
-								</Button>
-							</div>
-						</div>
-					{:else}
-						<ImageIcon size={32} class="mb-2 opacity-50" />
-						<p class="text-sm">Klicke oder ziehe eine Datei hierher</p>
-						<p class="mt-1 text-xs">PNG, JPG oder PDF (Max. empfohlen: 5MB)</p>
+						{/each}
 					{/if}
+
+					<!-- Newly selected files -->
+					{#each selectedFiles as file, index}
+						<div class="bg-blue-50 dark:bg-blue-900/20 flex items-center justify-between rounded-md p-2 text-sm">
+							<div class="flex items-center gap-2 truncate">
+								{#if file.type.startsWith('image/')}
+									<ImageIcon size={16} class="shrink-0" />
+								{:else}
+									<FileText size={16} class="shrink-0" />
+								{/if}
+								<span class="truncate">{file.name}</span>
+								<span class="text-muted-foreground text-xs">
+									({(file.size / 1024 / 1024).toFixed(2)} MB)
+								</span>
+							</div>
+							<Button
+								variant="ghost"
+								size="icon"
+								class="h-8 w-8 text-destructive"
+								onclick={(e) => {
+									e.stopPropagation();
+									removeSelectedFile(index);
+								}}
+							>
+								<Trash2 size={14} />
+							</Button>
+						</div>
+					{/each}
 				</div>
 			</div>
 		</div>

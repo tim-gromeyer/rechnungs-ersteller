@@ -82,14 +82,18 @@ export async function generateExportZip(year: number, onProgress?: (msg: string)
 	const expenseFolder = zip.folder('Ausgaben');
 
 	for (const exp of filteredExpenses) {
-		if (exp.receiptId) {
-			const receipt = await db.getReceipt(exp.receiptId);
-			if (receipt) {
-				const decompressed = await ungzipBlob(receipt.fileData);
-				const extension = receipt.fileType.split('/')[1] || 'pdf';
-				// Name: EXP_ID_Description.ext
-				const fileName = `EXP_${exp.id.slice(0, 8)}_${exp.description.replace(/[^a-z0-9]/gi, '_')}.${extension}`;
-				expenseFolder?.file(fileName, decompressed);
+		if (exp.receiptIds && exp.receiptIds.length > 0) {
+			for (let i = 0; i < exp.receiptIds.length; i++) {
+				const receiptId = exp.receiptIds[i];
+				const receipt = await db.getReceipt(receiptId);
+				if (receipt) {
+					const decompressed = await ungzipBlob(receipt.fileData);
+					const extension = receipt.fileType.split('/')[1] || 'pdf';
+					// Name: EXP_ID_Description_Counter.ext
+					const suffix = exp.receiptIds.length > 1 ? `_${i + 1}` : '';
+					const fileName = `EXP_${exp.id.slice(0, 8)}_${exp.description.replace(/[^a-z0-9]/gi, '_')}${suffix}.${extension}`;
+					expenseFolder?.file(fileName, decompressed);
+				}
 			}
 		}
 	}

@@ -17,9 +17,11 @@ export async function exportDatabase(): Promise<void> {
 	// Fetch all receipts
 	const receipts: Receipt[] = [];
 	for (const expense of expenses) {
-		if (expense.receiptId) {
-			const receipt = await db.getReceipt(expense.receiptId);
-			if (receipt) receipts.push(receipt);
+		if (expense.receiptIds && expense.receiptIds.length > 0) {
+			for (const receiptId of expense.receiptIds) {
+				const receipt = await db.getReceipt(receiptId);
+				if (receipt) receipts.push(receipt);
+			}
 		}
 	}
 

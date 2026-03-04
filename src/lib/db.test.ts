@@ -25,7 +25,8 @@ describe('db.ts IndexedDB Wrapper', () => {
 			date: '2026-03-03',
 			amount: 50.0,
 			description: 'Test Expense',
-			category: 'Tests'
+			category: 'Tests',
+			receiptIds: []
 		};
 
 		await db.saveExpense(expense);
@@ -41,7 +42,8 @@ describe('db.ts IndexedDB Wrapper', () => {
 			date: '2026-03-04',
 			amount: 100.0,
 			description: 'To Delete',
-			category: 'Tests'
+			category: 'Tests',
+			receiptIds: []
 		};
 
 		await db.saveExpense(expense);
@@ -75,14 +77,16 @@ describe('db.ts IndexedDB Wrapper', () => {
 			date: '2026-01-01',
 			amount: 10,
 			description: 'A',
-			category: 'C'
+			category: 'C',
+			receiptIds: []
 		};
 		const exp2: Expense = {
 			id: '2',
 			date: '2026-01-02',
 			amount: 20,
 			description: 'B',
-			category: 'C'
+			category: 'C',
+			receiptIds: []
 		};
 
 		await db.saveExpense(exp1);

@@ -31,7 +31,7 @@ export function getEUERCSVContent(invoices: Invoice[], expenses: Expense[], year
 
 	// Ausgaben
 	filteredExpenses.forEach((exp) => {
-		csvContent += `${new Date(exp.date).toLocaleDateString('de-DE')};Ausgabe;${exp.receiptId ? exp.id : '-'};${exp.description};${exp.category};-${exp.amount.toFixed(2).replace('.', ',')}\n`;
+		csvContent += `${new Date(exp.date).toLocaleDateString('de-DE')};Ausgabe;${exp.receiptIds && exp.receiptIds.length > 0 ? exp.id : '-'};${exp.description};${exp.category};-${exp.amount.toFixed(2).replace('.', ',')}\n`;
 	});
 
 	return csvContent;

@@ -78,7 +78,7 @@ export interface Expense {
 	amount: number;
 	description: string;
 	category: string;
-	receiptId?: string; // Links to a saved receipt
+	receiptIds: string[]; // Links to saved receipts
 }
 
 export interface OcrResult {
