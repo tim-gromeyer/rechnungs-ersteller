@@ -66,13 +66,13 @@ export function generateZugferdXml(invoice: Invoice): string {
 						]),
 						sender.taxId
 							? container('ram:SpecifiedTaxRegistration', [
-									el('ram:ID', sender.taxId, { schemeID: 'FC' })
-								])
+								el('ram:ID', sender.taxId, { schemeID: 'FC' })
+							])
 							: undefined,
 						sender.vatId
 							? container('ram:SpecifiedTaxRegistration', [
-									el('ram:ID', sender.vatId, { schemeID: 'VA' })
-								])
+								el('ram:ID', sender.vatId, { schemeID: 'VA' })
+							])
 							: undefined
 					]),
 					container('ram:BuyerTradeParty', [
@@ -85,8 +85,24 @@ export function generateZugferdXml(invoice: Invoice): string {
 						])
 					])
 				]),
+				container('ram:ApplicableHeaderTradeDelivery', [
+					container('ram:ActualDeliverySupplyChainEvent', [
+						container('ram:OccurrenceDateTime', [
+							el('udt:DateTimeString', (invoice.serviceDate || date).replace(/-/g, ''), { format: '102' })
+						])
+					])
+				]),
 				container('ram:ApplicableHeaderTradeSettlement', [
 					el('ram:InvoiceCurrencyCode', currency),
+					container('ram:SpecifiedTradeSettlementPaymentMeans', [
+						el('ram:TypeCode', 58), // SEPA Credit Transfer
+						container('ram:PayeePartyCreditorFinancialAccount', [
+							el('ram:IBANID', sender.iban || '')
+						]),
+						container('ram:PayeeSpecifiedCreditorFinancialInstitution', [
+							el('ram:BICID', sender.bic || '')
+						])
+					]),
 					container('ram:ApplicableTradeTax', [
 						el('ram:CalculatedAmount', vatTotal.toFixed(2)),
 						el('ram:TypeCode', 'VAT'),
@@ -95,9 +111,9 @@ export function generateZugferdXml(invoice: Invoice): string {
 						el('ram:RateApplicablePercent', settings.vatRate)
 					]),
 					container('ram:SpecifiedTradeSettlementHeaderMonetarySummation', [
-						el('ram:LineTotalAmount', netTotal.toFixed(2)), // Correct: Sum of line net amounts
+						el('ram:LineTotalAmount', netTotal.toFixed(2)),
 						el('ram:ChargeTotalAmount', '0.00'),
-						el('ram:AllowanceTotalAmount', '0.00'), // Note: Discounts are handled as negative lines
+						el('ram:AllowanceTotalAmount', '0.00'),
 						el('ram:TaxBasisTotalAmount', netTotal.toFixed(2)),
 						el('ram:TaxTotalAmount', vatTotal.toFixed(2), { currencyID: currency }),
 						el('ram:GrandTotalAmount', grossTotal.toFixed(2)),

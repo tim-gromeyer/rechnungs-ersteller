@@ -1,8 +1,8 @@
 import JSZip from 'jszip';
-import { jsPDF } from 'jspdf';
 import { db } from '../db';
 import { getEUERCSVContent } from './export';
 import { ungzipBlob } from './image';
+import * as m from '$lib/paraglide/messages';
 
 export async function generateExportZip(year: number, onProgress?: (msg: string) => void) {
 	onProgress?.('Lade Daten...');
@@ -25,44 +25,57 @@ export async function generateExportZip(year: number, onProgress?: (msg: string)
 	onProgress?.(`Generiere ${filteredInvoices.length} Rechnungs-PDFs...`);
 	const incomeFolder = zip.folder('Einnahmen');
 
+	// Initialize the worker correctly for Vite
+	const PdfWorkerDef = await import('$lib/workers/pdf.worker.ts?worker');
+	const pdfWorker = new PdfWorkerDef.default();
+
 	for (let i = 0; i < filteredInvoices.length; i++) {
 		const inv = filteredInvoices[i];
 		onProgress?.(`Verarbeite Rechnung ${i + 1}/${filteredInvoices.length}: ${inv.number}`);
 
-		// In Svelte 5, we can't easily mount a component dynamically in a pure TS util without some tricks
-		// or passing a reference.
-		// For now, let's assume we might need a more robust way to handle this if it gets complex.
-		// Alternatively, we can use jspdf's API to build the PDF manually, but that's a lot of work to match the CSS.
+		// Build translations for the worker
+		const translations = {
+			title: m.invoice_title(),
+			subtotal: m.invoice_subtotal(),
+			discount: m.invoice_discount(),
+			net: m.invoice_net(),
+			plusVat: m.invoice_plusVat({ rate: inv.settings.vatRate }),
+			gross: m.invoice_gross(),
+			description: m.invoice_description(),
+			price: m.invoice_price(),
+			quantity: m.invoice_quantity(),
+			amount: m.invoice_amount(),
+			taxId: m.invoice_taxId(),
+			date: m.invoice_date(),
+			number: m.invoice_number(),
+			serviceDate: m.invoice_serviceDate(),
+			bank: m.invoice_bank(),
+			iban: m.invoice_iban(),
+			bic: m.invoice_bic()
+		};
 
-		// Let's try to find if there's a simpler way. The user has jspdf.
-		// If we use html2canvas, we need the DOM element.
+		// Request PDF generation from worker
+		const pdfBuffer = await new Promise<ArrayBuffer>((resolve, reject) => {
+			const handler = (e: MessageEvent) => {
+				if (e.data.success) {
+					pdfWorker.removeEventListener('message', handler);
+					resolve(e.data.pdfBuffer);
+				} else {
+					pdfWorker.removeEventListener('message', handler);
+					reject(e.data.error);
+				}
+			};
+			pdfWorker.addEventListener('message', handler);
+			pdfWorker.postMessage({ invoice: inv, translations, previewOnly: false });
+		});
 
-		// NOTE: Since I cannot easily "mount" Svelte 5 components here without the app context,
-		// I will implement a placeholder logic for PDF generation and suggest the user
-		// that they might need to provide a Ref to the Preview component or we use a simpler PDF layout.
-
-		// Actually, I can create a temporary PDF with basic info if html2canvas is too hard here.
-		// BUT the requirement is "Alle deine Ausgangsrechnungen als PDF".
-
-		const doc = new jsPDF();
-		doc.setFontSize(20);
-		doc.text(`Rechnung ${inv.number}`, 20, 20);
-		doc.setFontSize(12);
-		doc.text(`Datum: ${inv.date}`, 20, 30);
-		doc.text(`Kunde: ${inv.customer.name}`, 20, 40);
-		doc.text(
-			`Betrag: ${inv.articles.reduce((sum, a) => sum + a.pricePerUnit * a.amount, 0).toFixed(2)}`,
-			20,
-			50
-		);
-		doc.text('--- Details in der CSV ---', 20, 70);
-
-		const pdfBlob = doc.output('blob');
 		incomeFolder?.file(
 			`${inv.number}_${inv.customer.name.replace(/[^a-z0-9]/gi, '_')}.pdf`,
-			pdfBlob
+			pdfBuffer
 		);
 	}
+
+	pdfWorker.terminate();
 
 	// 3. Expenses (Ausgaben)
 	onProgress?.(`Sammle ${filteredExpenses.length} Belege...`);

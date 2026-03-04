@@ -10,8 +10,7 @@
 		Github,
 		Menu,
 		X,
-		ChevronLeft,
-		ChevronRight
+		ChevronLeft
 	} from 'lucide-svelte';
 	import { Button } from '$lib/components/ui/button';
 	import { cn } from '$lib/utils';
@@ -101,7 +100,7 @@
 	</div>
 
 	<nav class="flex-grow space-y-1 p-3">
-		{#each navItems as item}
+		{#each navItems as item (item.href)}
 			<a
 				href={i18n.resolveRoute(item.href, i18n.getLanguageTag())}
 				class={cn(
