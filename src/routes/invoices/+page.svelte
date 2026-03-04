@@ -10,6 +10,7 @@
 	import * as m from '$lib/paraglide/messages';
 	import { cn } from '$lib/utils';
 	import ConfirmDialog from '../components/ConfirmDialog.svelte';
+	import { googleDriveSync } from '$lib/utils/googleDrive';
 
 	let invoices = $state<Invoice[]>([]);
 	let searchQuery = $state('');
@@ -57,13 +58,25 @@
 			await db.deleteInvoice(invoiceToDelete);
 			await loadInvoices();
 			invoiceToDelete = null;
+
+			// Auto-sync to cloud if logged in
+			googleDriveSync.getValidToken().then((token) => {
+				if (token)
+					googleDriveSync.syncToCloud().catch((err) => console.error('Cloud sync failed:', err));
+			});
 		}
 	}
 
 	async function togglePaidStatus(invoice: Invoice) {
-		const updated = { ...invoice, isPaid: !invoice.isPaid };
-		await db.saveInvoice($state.snapshot(updated));
+		const updatedInvoice = { ...invoice, isPaid: !invoice.isPaid };
+		await db.saveInvoice($state.snapshot(updatedInvoice));
 		await loadInvoices();
+
+		// Auto-sync to cloud if logged in
+		googleDriveSync.getValidToken().then((token) => {
+			if (token)
+				googleDriveSync.syncToCloud().catch((err) => console.error('Cloud sync failed:', err));
+		});
 	}
 
 	function formatCurrency(amount: number) {

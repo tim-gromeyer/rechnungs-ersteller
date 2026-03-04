@@ -14,6 +14,7 @@
 	import { compressImageToBlob, gzipBlob, ungzipBlob } from '$lib/utils/image';
 	import ConfirmDialog from '../components/ConfirmDialog.svelte';
 	import ExportButton from '../components/ExportButton.svelte';
+	import { googleDriveSync } from '$lib/utils/googleDrive';
 
 	let allExpenses = $state<Expense[]>([]);
 	let selectedYear = $state<number>(new Date().getFullYear());
@@ -206,6 +207,12 @@
 			await db.saveExpense(expense);
 			await loadData();
 
+			// Auto-sync to cloud if logged in
+			googleDriveSync.getValidToken().then((token) => {
+				if (token)
+					googleDriveSync.syncToCloud().catch((err) => console.error('Cloud sync failed:', err));
+			});
+
 			// Reset form
 			isAddDialogOpen = false;
 			isEditing = false;
@@ -246,6 +253,12 @@
 			await db.deleteExpense(expenseToDelete);
 			await loadData();
 			expenseToDelete = null;
+
+			// Auto-sync to cloud if logged in
+			googleDriveSync.getValidToken().then((token) => {
+				if (token)
+					googleDriveSync.syncToCloud().catch((err) => console.error('Cloud sync failed:', err));
+			});
 		}
 	}
 </script>

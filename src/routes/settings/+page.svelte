@@ -7,7 +7,17 @@
 		CardTitle,
 		CardDescription
 	} from '$lib/components/ui/card';
-	import { ArrowLeft, Download, Upload, Server, Database } from 'lucide-svelte';
+	import {
+		ArrowLeft,
+		Download,
+		Upload,
+		Server,
+		Database,
+		Cloud,
+		CloudOff,
+		RefreshCw,
+		LogOut
+	} from 'lucide-svelte';
 	import { exportDatabase, importDatabase } from '$lib/utils/backup';
 	import * as m from '$lib/paraglide/messages';
 	import ConfirmDialog from '../components/ConfirmDialog.svelte';
@@ -16,6 +26,8 @@
 	import { getStorageEstimate, formatBytes } from '$lib/utils/storage';
 	import { onMount } from 'svelte';
 	import { Trash2, AlertTriangle } from 'lucide-svelte';
+	import { googleDriveSync } from '$lib/utils/googleDrive';
+	import { cn } from '$lib/utils';
 
 	let fileInput: HTMLInputElement;
 	let isImporting = $state(false);
@@ -32,8 +44,15 @@
 	let storageInfo = $state<{ usage: number; quota: number; percentage: number } | null>(null);
 	let storeSizes = $state<Record<string, number>>({});
 
+	let isDriveLoggedIn = $state(false);
+	let isSyncing = $state(false);
+	let lastCloudSync = $state<string | null>(null);
+
 	onMount(async () => {
 		await refreshStorageInfo();
+		const token = await googleDriveSync.getValidToken();
+		isDriveLoggedIn = !!token;
+		lastCloudSync = localStorage.getItem('gdrive_last_sync');
 	});
 
 	async function refreshStorageInfo() {
@@ -95,6 +114,58 @@
 			showInfo(m.settings_delete_all_title(), 'Fehler beim Löschen der Daten.');
 		} finally {
 			deleteConfirmOpen = false;
+		}
+	}
+
+	async function handleGoogleLogin() {
+		try {
+			await googleDriveSync.login();
+			isDriveLoggedIn = true;
+			showInfo('Cloud Sync', 'Erfolgreich mit Google Drive verbunden!');
+		} catch (e) {
+			console.error('Google login failed:', e);
+			showInfo('Cloud Sync', 'Anmeldung fehlgeschlagen.');
+		}
+	}
+
+	async function handleGoogleLogout() {
+		await googleDriveSync.logout();
+		isDriveLoggedIn = false;
+		showInfo('Cloud Sync', 'Abgemeldet.');
+	}
+
+	async function handleCloudSync() {
+		isSyncing = true;
+		try {
+			await googleDriveSync.syncToCloud();
+			lastCloudSync = new Date().toISOString();
+			showInfo('Cloud Sync', 'Synchronisierung erfolgreich!');
+		} catch (e) {
+			console.error('Sync failed:', e);
+			showInfo('Cloud Sync', 'Fehler bei der Synchronisierung.');
+		} finally {
+			isSyncing = false;
+		}
+	}
+
+	async function handleCloudRestore() {
+		isSyncing = true;
+		try {
+			const success = await googleDriveSync.syncFromCloud();
+			if (success) {
+				showInfo(
+					'Cloud Restore',
+					'Daten erfolgreich aus der Cloud geladen. Die Seite wird neu geladen.'
+				);
+				setTimeout(() => window.location.reload(), 1500);
+			} else {
+				showInfo('Cloud Restore', 'Kein Backup in der Cloud gefunden.');
+			}
+		} catch (e) {
+			console.error('Restore failed:', e);
+			showInfo('Cloud Restore', 'Fehler beim Laden der Daten.');
+		} finally {
+			isSyncing = false;
 		}
 	}
 </script>
@@ -160,6 +231,86 @@
 						</Button>
 					</div>
 				</div>
+			</CardContent>
+		</Card>
+
+		<Card>
+			<CardHeader>
+				<CardTitle class="flex items-center gap-2">
+					<Cloud size={20} />
+					Cloud-Synchronisierung
+				</CardTitle>
+				<CardDescription>
+					Sichere deine Daten automatisch in deinem Google Drive (AppData).
+				</CardDescription>
+			</CardHeader>
+			<CardContent class="grid gap-6">
+				{#if !isDriveLoggedIn}
+					<div class="flex flex-col items-center justify-center py-6 text-center">
+						<CloudOff size={48} class="text-muted-foreground mb-4 opacity-20" />
+						<p class="text-muted-foreground mb-6 max-w-xs text-sm">
+							Verbinde dein Google-Konto, um Backups in der Cloud zu speichern und zwischen Geräten
+							zu synchronisieren.
+						</p>
+						<Button onclick={handleGoogleLogin} class="bg-[#4285F4] text-white hover:bg-[#357ae8]">
+							<Cloud size={18} class="mr-2" />
+							Mit Google Drive verbinden
+						</Button>
+					</div>
+				{:else}
+					<div class="space-y-4">
+						<div class="flex items-center justify-between rounded-lg border p-4">
+							<div class="flex items-center gap-3">
+								<div class="rounded-full bg-green-100 p-2 text-green-600 dark:bg-green-900/30">
+									<Cloud size={20} />
+								</div>
+								<div>
+									<div class="flex items-center gap-2">
+										<span class="text-sm font-medium">Status: Verbunden</span>
+										<span
+											class="rounded-full border px-2 py-0.5 text-[10px] font-medium tracking-wider uppercase"
+											>Google Drive</span
+										>
+									</div>
+									<p class="text-muted-foreground mt-0.5 text-xs">
+										{lastCloudSync
+											? `Letzter Sync: ${new Date(lastCloudSync).toLocaleString()}`
+											: 'Noch nie synchronisiert'}
+									</p>
+								</div>
+							</div>
+							<Button
+								variant="ghost"
+								size="sm"
+								onclick={handleGoogleLogout}
+								class="text-muted-foreground h-8 px-2"
+							>
+								<LogOut size={14} class="mr-1.5" /> Abmelden
+							</Button>
+						</div>
+
+						<div class="grid grid-cols-2 gap-3">
+							<Button
+								onclick={handleCloudSync}
+								disabled={isSyncing}
+								variant="outline"
+								class="w-full"
+							>
+								<RefreshCw size={16} class={cn('mr-2', isSyncing && 'animate-spin')} />
+								Jetzt Sichern
+							</Button>
+							<Button
+								onclick={handleCloudRestore}
+								disabled={isSyncing}
+								variant="outline"
+								class="w-full"
+							>
+								<Download size={16} class="mr-2" />
+								Laden
+							</Button>
+						</div>
+					</div>
+				{/if}
 			</CardContent>
 		</Card>
 

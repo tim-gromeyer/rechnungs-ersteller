@@ -29,6 +29,7 @@
 		<link rel="alternate" hreflang={locale} href={getHreflangUrl(locale)} />
 	{/each}
 	<link rel="alternate" hreflang="x-default" href={getHreflangUrl('en')} />
+	<script src="https://accounts.google.com/gsi/client" async defer></script>
 </svelte:head>
 
 <ModeWatcher />

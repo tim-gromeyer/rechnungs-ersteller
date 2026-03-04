@@ -24,6 +24,20 @@ async function base64ToBlob(base64: string): Promise<Blob> {
 }
 
 export async function exportDatabase(): Promise<void> {
+	const backup: BackupData = await prepareBackup();
+
+	const blob = new Blob([JSON.stringify(backup)], { type: 'application/json' });
+	const url = URL.createObjectURL(blob);
+	const link = document.createElement('a');
+	link.href = url;
+	link.download = `RechnungsErsteller_Backup_${new Date().toISOString().split('T')[0]}.json`;
+	document.body.appendChild(link);
+	link.click();
+	document.body.removeChild(link);
+	URL.revokeObjectURL(url);
+}
+
+export async function prepareBackup(): Promise<BackupData> {
 	const invoices = await db.getAllInvoices();
 	const expenses = await db.getAllExpenses();
 
@@ -43,23 +57,13 @@ export async function exportDatabase(): Promise<void> {
 		}
 	}
 
-	const backup: BackupData = {
-		version: 2, // Increment version
+	return {
+		version: 2,
 		date: new Date().toISOString(),
 		invoices,
 		expenses,
 		receipts
 	};
-
-	const blob = new Blob([JSON.stringify(backup)], { type: 'application/json' });
-	const url = URL.createObjectURL(blob);
-	const link = document.createElement('a');
-	link.href = url;
-	link.download = `RechnungsErsteller_Backup_${new Date().toISOString().split('T')[0]}.json`;
-	document.body.appendChild(link);
-	link.click();
-	document.body.removeChild(link);
-	URL.revokeObjectURL(url);
 }
 
 export async function importDatabase(file: File): Promise<void> {
