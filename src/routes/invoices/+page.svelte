@@ -91,37 +91,54 @@
 </script>
 
 <div class="container mx-auto max-w-6xl p-4 sm:p-8">
-	<div class="mb-8 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-		<div class="flex items-center gap-4">
-			<Button variant="ghost" size="icon" href="/dashboard" class="shrink-0">
-				<ArrowLeft size={24} />
+	<div class="mb-10 flex flex-col gap-6 sm:flex-row sm:items-center sm:justify-between">
+		<div class="flex items-center gap-5">
+			<Button
+				variant="outline"
+				size="icon"
+				href="/dashboard"
+				class="shrink-0 rounded-full shadow-sm"
+			>
+				<ArrowLeft size={20} />
 			</Button>
 			<div>
-				<h1 class="text-3xl font-bold">{m.common_invoices()}</h1>
-				<p class="text-muted-foreground text-sm">Verwalte deine Rechnungen und Zahlungsstatus</p>
+				<h1 class="text-4xl font-extrabold tracking-tight">{m.common_invoices()}</h1>
+				<p class="text-muted-foreground mt-1 text-sm font-medium">
+					Verwalte deine Rechnungen und Zahlungsstatus professionell
+				</p>
 			</div>
 		</div>
-		<Button onclick={handleCreateNew} class="gap-2">
-			<Plus size={18} />
+		<Button onclick={handleCreateNew} class="h-10 px-5 font-semibold shadow-md active:scale-95">
+			<Plus size={18} class="mr-2" />
 			{m.dashboard_newInvoice()}
 		</Button>
 	</div>
 
-	<div class="mb-6 flex flex-col gap-4 sm:flex-row">
+	<div class="mb-8 grid gap-4 sm:flex">
 		<div class="relative flex-grow">
-			<Search class="text-muted-foreground absolute top-1/2 left-3 h-4 w-4 -translate-y-1/2" />
+			<Search class="text-muted-foreground absolute top-1/2 left-3.5 h-4 w-4 -translate-y-1/2" />
 			<input
 				type="text"
 				placeholder="Suchen nach Nummer, Kunde oder Titel..."
 				bind:value={searchQuery}
-				class="bg-card focus:ring-primary w-full rounded-md border py-2 pr-4 pl-10 transition-all outline-none focus:ring-2"
+				class="bg-card focus:ring-primary h-11 w-full rounded-xl border px-4 pl-11 shadow-sm transition-all outline-none focus:ring-2"
 			/>
 		</div>
 		<div class="flex gap-2">
-			<Button variant="outline" size="icon" title="Filter (coming soon)">
+			<Button
+				variant="outline"
+				size="icon"
+				class="h-11 w-11 rounded-xl shadow-sm"
+				title="Filter (coming soon)"
+			>
 				<Filter size={18} />
 			</Button>
-			<Button variant="outline" size="icon" title="Export CSV (coming soon)">
+			<Button
+				variant="outline"
+				size="icon"
+				class="h-11 w-11 rounded-xl shadow-sm"
+				title="Export CSV (coming soon)"
+			>
 				<Download size={18} />
 			</Button>
 		</div>
@@ -129,67 +146,78 @@
 
 	{#if isLoading}
 		<div class="flex h-64 items-center justify-center">
-			<div class="border-primary h-8 w-8 animate-spin rounded-full border-b-2"></div>
+			<div class="border-primary h-10 w-10 animate-spin rounded-full border-b-2"></div>
 		</div>
 	{:else if filteredInvoices.length === 0}
-		<Card class="border-dashed py-20 text-center">
-			<div class="flex flex-col items-center gap-4">
-				<div class="bg-muted flex h-16 w-16 items-center justify-center rounded-full">
-					<FileText size={32} class="text-muted-foreground" />
-				</div>
+		<Card class="border-dashed bg-transparent py-24 text-center shadow-none">
+			<CardContent class="flex flex-col items-center gap-4 opacity-30">
+				<FileText size={64} />
 				<div>
-					<h3 class="text-xl font-semibold">Keine Rechnungen gefunden</h3>
-					<p class="text-muted-foreground">
-						Erstelle deine erste Rechnung, um sie hier zu verwalten.
+					<h3 class="text-2xl font-bold tracking-tight">Keine Rechnungen gefunden</h3>
+					<p class="text-muted-foreground mx-auto max-w-sm">
+						Erstelle deine erste Rechnung, um sie hier professionell zu verwalten.
 					</p>
 				</div>
-				<Button onclick={handleCreateNew} variant="outline">Jetzt Rechnung schreiben</Button>
-			</div>
+				<Button onclick={handleCreateNew} variant="outline" class="mt-4 font-bold"
+					>Jetzt Rechnung schreiben</Button
+				>
+			</CardContent>
 		</Card>
 	{:else}
 		<div class="grid gap-4">
 			{#each filteredInvoices as invoice (invoice.id)}
-				<Card class="hover:bg-muted/30 group transition-all">
+				<Card
+					class="hover:bg-muted/40 group overflow-hidden border-none ring-1 shadow-lg ring-black/[0.05] transition-all duration-300 dark:ring-white/[0.05]"
+				>
 					<CardContent
-						class="flex flex-col gap-4 p-5 sm:flex-row sm:items-center sm:justify-between"
+						class="flex flex-col gap-6 p-6 sm:flex-row sm:items-center sm:justify-between"
 					>
-						<div class="flex items-center gap-4">
+						<div class="flex items-center gap-5">
 							<div
 								class={cn(
-									'flex h-12 w-12 items-center justify-center rounded-full transition-colors',
+									'flex h-12 w-12 shrink-0 items-center justify-center rounded-xl shadow-sm transition-all duration-300',
 									invoice.isPaid
-										? 'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400'
-										: 'bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-400'
+										? 'bg-green-100 text-green-700 dark:bg-green-900/40 dark:text-green-400'
+										: 'bg-blue-100 text-blue-700 dark:bg-blue-900/40 dark:text-blue-400'
 								)}
 							>
 								<FileText size={24} />
 							</div>
-							<div class="grid gap-0.5">
-								<div class="flex items-center gap-2 text-lg font-bold">
-									{invoice.number}
+							<div class="grid gap-1">
+								<div class="flex items-center gap-3">
+									<span class="text-xl font-semibold tracking-tight">{invoice.number}</span>
 									{#if invoice.title}
-										<span class="text-muted-foreground text-sm font-medium">• {invoice.title}</span>
+										<span class="text-muted-foreground hidden text-sm font-medium sm:inline"
+											>• {invoice.title}</span
+										>
 									{/if}
 								</div>
-								<div class="text-muted-foreground flex items-center gap-2 text-sm">
-									<span>{new Date(invoice.date).toLocaleDateString('de-DE')}</span>
-									<span>•</span>
+								<div
+									class="text-muted-foreground flex items-center gap-2 text-[11px] font-medium tracking-wider uppercase"
+								>
+									<span class="bg-muted text-foreground rounded px-2 py-0.5"
+										>{new Date(invoice.date).toLocaleDateString('de-DE')}</span
+									>
+									<span class="opacity-30">•</span>
 									<span class="text-foreground font-medium">{invoice.customer.name}</span>
 								</div>
 							</div>
 						</div>
 
-						<div class="flex items-center justify-between gap-6 border-t pt-4 sm:border-0 sm:pt-0">
-							<div class="flex items-center gap-3">
+						<div class="flex items-center justify-between gap-8 border-t pt-4 sm:border-0 sm:pt-0">
+							<div class="flex items-center gap-8">
 								<div class="flex flex-col items-end">
-									<span class="text-muted-foreground text-[10px] font-bold tracking-wider uppercase"
-										>Status</span
+									<span
+										class="text-muted-foreground text-[10px] font-medium tracking-wider uppercase opacity-50"
+										>Zahlungsstatus</span
 									>
-									<div class="flex items-center gap-2">
+									<div class="mt-1 flex items-center gap-3">
 										<span
 											class={cn(
-												'text-xs font-medium',
-												invoice.isPaid ? 'text-green-600' : 'text-blue-600'
+												'text-xs font-semibold tracking-tight uppercase',
+												invoice.isPaid
+													? 'text-green-600 dark:text-green-400'
+													: 'text-blue-600 dark:text-blue-400'
 											)}
 										>
 											{invoice.isPaid ? 'Bezahlt' : 'Offen'}
@@ -200,31 +228,32 @@
 										/>
 									</div>
 								</div>
-								<div class="bg-border hidden h-8 w-px sm:block"></div>
-								<div class="flex min-w-[120px] flex-col items-end">
-									<span class="text-muted-foreground text-[10px] font-bold tracking-wider uppercase"
-										>Betrag</span
+								<div class="bg-border hidden h-10 w-px sm:block"></div>
+								<div class="flex min-w-[140px] flex-col items-end">
+									<span
+										class="text-muted-foreground text-[10px] font-medium tracking-wider uppercase opacity-50"
+										>Bruttobetrag</span
 									>
-									<div class="text-xl font-extrabold">
+									<div class="text-2xl font-semibold tracking-tighter">
 										{formatCurrency(calculateTotal(invoice))}
 									</div>
 								</div>
 							</div>
 
-							<div class="flex gap-1">
+							<div class="flex gap-2 opacity-0 transition-all duration-300 group-hover:opacity-100">
 								<Button
-									variant="ghost"
+									variant="secondary"
 									size="icon"
 									onclick={() => handleEdit(invoice.id)}
-									class="h-10 w-10"
+									class="hover:bg-primary hover:text-primary-foreground h-10 w-10 rounded-full shadow-sm"
 								>
 									<Edit size={18} />
 								</Button>
 								<Button
-									variant="ghost"
+									variant="secondary"
 									size="icon"
 									onclick={() => confirmDelete(invoice.id)}
-									class="text-destructive hover:text-destructive hover:bg-destructive/10 h-10 w-10"
+									class="text-destructive hover:bg-destructive h-10 w-10 rounded-full shadow-sm hover:text-white"
 								>
 									<Trash2 size={18} />
 								</Button>
@@ -239,8 +268,8 @@
 
 <ConfirmDialog
 	bind:open={deleteDialogOpen}
-	title="Rechnung löschen?"
-	description="Diese Aktion kann nicht rückgängig gemacht werden. Die Rechnung wird dauerhaft gelöscht."
+	title={m.dashboard_deleteInvoice()}
+	description={m.dashboard_confirmDeleteDescription()}
 	onConfirm={handleDelete}
 	onCancel={() => (deleteDialogOpen = false)}
 />

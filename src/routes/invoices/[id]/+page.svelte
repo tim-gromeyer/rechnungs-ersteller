@@ -5,12 +5,13 @@
 	import StatePersistence from '../../components/StatePersistence.svelte';
 	import { invoiceState } from '$lib/state.svelte';
 	import { generateZugferdXml } from '$lib/utils/zugferd';
-	import { Printer, Download, ArrowLeft } from 'lucide-svelte';
+	import { Printer, Download, ArrowLeft, Trash2 } from 'lucide-svelte';
 	import { cn } from '$lib/utils/cn';
 	import { db } from '$lib/db';
 	import { goto } from '$app/navigation';
 	import * as Button from '$lib/components/ui/button';
 	import * as m from '$lib/paraglide/messages';
+	import ConfirmDialog from '../../components/ConfirmDialog.svelte';
 
 	let id = $derived($page.params.id);
 	let loading = $state(true);
@@ -20,6 +21,7 @@
 	let currentPdfUrl: string | null = $state(null);
 	let isGenerating = $state(false);
 	let pdfError: string | null = $state(null);
+	let deleteDialogOpen = $state(false);
 	let debounceTimer: ReturnType<typeof setTimeout> | null = null;
 
 	// Create a stable reference to invoice to trigger reactions
@@ -170,6 +172,16 @@
 		document.body.removeChild(a);
 		URL.revokeObjectURL(url);
 	}
+
+	async function handleDelete() {
+		if (!id) return;
+		try {
+			await db.deleteInvoice(id);
+			goto('/invoices');
+		} catch (e) {
+			console.error('Error deleting invoice:', e);
+		}
+	}
 </script>
 
 {#if loading}
@@ -211,6 +223,17 @@
 							<Download size={16} />
 							<span class="hidden md:inline">{m.preview_downloadXml()}</span>
 						</button>
+						{#if id !== 'new'}
+							<button
+								onclick={() => (deleteDialogOpen = true)}
+								class={cn(
+									'border-destructive/30 bg-background text-destructive hover:bg-destructive hover:text-destructive-foreground inline-flex h-9 items-center justify-center gap-2 rounded-lg border px-3 text-sm font-medium transition-all active:scale-95'
+								)}
+							>
+								<Trash2 size={16} />
+								<span class="hidden md:inline">{m.common_delete()}</span>
+							</button>
+						{/if}
 						<button
 							onclick={handleSavePdf}
 							disabled={!currentPdfUrl}
@@ -293,3 +316,11 @@
 		</div>
 	</StatePersistence>
 {/if}
+
+<ConfirmDialog
+	bind:open={deleteDialogOpen}
+	title={m.dashboard_deleteInvoice()}
+	description={m.dashboard_confirmDeleteDescription()}
+	onConfirm={handleDelete}
+	onCancel={() => (deleteDialogOpen = false)}
+/>

@@ -250,21 +250,27 @@
 	}
 </script>
 
-<div class="container mx-auto max-w-5xl p-8">
-	<div class="mb-8 flex items-center justify-between">
-		<div class="flex items-center gap-4">
-			<Button variant="ghost" size="icon" href="/">
-				<ArrowLeft size={24} />
+<div class="container mx-auto max-w-6xl p-4 sm:p-8">
+	<div class="mb-10 flex flex-col gap-6 sm:flex-row sm:items-center sm:justify-between">
+		<div class="flex items-center gap-5">
+			<Button variant="outline" size="icon" href="/" class="shrink-0 rounded-full shadow-sm">
+				<ArrowLeft size={20} />
 			</Button>
-			<h1 class="text-3xl font-bold">Ausgaben & Belege</h1>
+			<div>
+				<h1 class="text-4xl font-extrabold tracking-tight">Ausgaben & Belege</h1>
+				<p class="text-muted-foreground mt-1 text-sm font-medium">
+					Verwalte deine Geschäftsausgaben und Belege GoBD-konform
+				</p>
+			</div>
 		</div>
-		<div class="flex items-center gap-4">
-			<div class="flex items-center gap-2">
-				<span class="text-muted-foreground text-sm font-medium">Jahr:</span>
-				<select
-					bind:value={selectedYear}
-					class="border-input bg-background focus:ring-ring rounded-md border px-3 py-1.5 text-sm shadow-sm outline-none focus:ring-2"
+		<div class="flex flex-wrap items-center gap-3">
+			<div
+				class="bg-card border-input flex items-center gap-2 rounded-lg border px-3 py-1.5 shadow-sm"
+			>
+				<span class="text-muted-foreground text-[10px] font-bold tracking-widest uppercase"
+					>Jahr</span
 				>
+				<select bind:value={selectedYear} class="bg-transparent text-sm font-semibold outline-none">
 					{#each availableYears as year (year)}
 						<option value={year}>{year}</option>
 					{/each}
@@ -284,101 +290,155 @@
 					isAddDialogOpen = true;
 				}}
 				variant="default"
+				class="h-10 px-5 font-semibold shadow-md active:scale-95"
 			>
-				<Plus size={16} class="mr-2" /> Neue Ausgabe
+				<Plus size={18} class="mr-2" /> Neue Ausgabe
 			</Button>
 		</div>
 	</div>
 
-	<Card>
+	<Card
+		class="overflow-hidden border-none ring-1 shadow-xl ring-black/[0.05] dark:ring-white/[0.05]"
+	>
 		<CardContent class="p-0">
-			<Table.Root>
-				<Table.Header>
-					<Table.Row>
-						<Table.Head>Datum</Table.Head>
-						<Table.Head>Beschreibung</Table.Head>
-						<Table.Head>Kategorie</Table.Head>
-						<Table.Head>Beleg</Table.Head>
-						<Table.Head class="text-right">Betrag</Table.Head>
-						<Table.Head class="w-[80px]"></Table.Head>
-					</Table.Row>
-				</Table.Header>
-				<Table.Body>
-					{#if expenses.length === 0}
-						<Table.Row>
-							<Table.Cell colspan={6} class="text-muted-foreground py-8 text-center">
-								Keine Ausgaben vorhanden.
-							</Table.Cell>
+			<div class="overflow-x-auto">
+				<Table.Root>
+					<Table.Header class="bg-muted/50">
+						<Table.Row class="hover:bg-transparent">
+							<Table.Head
+								class="text-muted-foreground w-[120px] pl-6 text-[10px] font-medium tracking-widest uppercase"
+								>Datum</Table.Head
+							>
+							<Table.Head
+								class="text-muted-foreground text-[10px] font-medium tracking-widest uppercase"
+								>Beschreibung</Table.Head
+							>
+							<Table.Head
+								class="text-muted-foreground text-[10px] font-medium tracking-widest uppercase"
+								>Kategorie</Table.Head
+							>
+							<Table.Head
+								class="text-muted-foreground text-[10px] font-medium tracking-widest uppercase"
+								>Belege</Table.Head
+							>
+							<Table.Head
+								class="text-muted-foreground pr-6 text-right text-[10px] font-medium tracking-widest uppercase"
+								>Betrag</Table.Head
+							>
+							<Table.Head class="w-[100px]"></Table.Head>
 						</Table.Row>
-					{:else}
-						{#each expenses as expense (expense.id)}
+					</Table.Header>
+					<Table.Body>
+						{#if expenses.length === 0}
 							<Table.Row>
-								<Table.Cell class="font-medium"
-									>{new Date(expense.date).toLocaleDateString('de-DE')}</Table.Cell
-								>
-								<Table.Cell>{expense.description}</Table.Cell>
-								<Table.Cell>{expense.category}</Table.Cell>
-								<Table.Cell>
-									<div class="flex flex-wrap gap-2">
-										{#if expense.receiptIds && expense.receiptIds.length > 0}
-											{#each expense.receiptIds as rid (rid)}
-												{#if receiptsMap[rid]}
-													{#if receiptsMap[rid].fileType.startsWith('image/')}
-														<button
-															onclick={() => openPreview(receiptsMap[rid])}
-															class="flex items-center text-blue-500 transition-opacity hover:opacity-80"
-															title={receiptsMap[rid].fileName}
-														>
-															<img
-																src={objectUrls[rid] || receiptsMap[rid].dataUrl}
-																alt="Receipt"
-																class="h-10 w-10 rounded border object-cover shadow-sm"
-															/>
-														</button>
-													{:else}
-														<button
-															onclick={() => openPreview(receiptsMap[rid])}
-															class="flex items-center gap-1 text-blue-500 hover:underline"
-															title={receiptsMap[rid].fileName}
-														>
-															<FileText size={20} />
-														</button>
-													{/if}
-												{/if}
-											{/each}
-										{:else}
-											<span class="text-muted-foreground text-sm">-</span>
-										{/if}
-									</div>
-								</Table.Cell>
-								<Table.Cell class="text-right font-medium text-red-600">
-									-{formatCurrency(expense.amount)}
-								</Table.Cell>
-								<Table.Cell class="text-right">
-									<div class="flex justify-end gap-1">
-										<Button
-											variant="ghost"
-											size="icon"
-											class="text-muted-foreground hover:text-foreground"
-											onclick={() => editExpense(expense)}
-										>
-											<Edit size={16} />
-										</Button>
-										<Button
-											variant="ghost"
-											size="icon"
-											class="text-destructive hover:text-destructive"
-											onclick={() => confirmDelete(expense.id)}
-										>
-											<Trash2 size={16} />
-										</Button>
+								<Table.Cell colspan={6} class="py-24 text-center">
+									<div class="flex flex-col items-center gap-3 opacity-30">
+										<FileText size={48} />
+										<p class="text-lg font-medium tracking-tight">
+											Keine Ausgaben im Jahr {selectedYear} gefunden.
+										</p>
 									</div>
 								</Table.Cell>
 							</Table.Row>
-						{/each}
-					{/if}
-				</Table.Body>
-			</Table.Root>
+						{:else}
+							{#each expenses as expense (expense.id)}
+								<Table.Row
+									class="hover:bg-muted/50 group border-b transition-all duration-200 last:border-0"
+								>
+									<Table.Cell class="text-muted-foreground pl-6 font-medium">
+										<div class="flex flex-col">
+											<span class="text-foreground"
+												>{new Date(expense.date).toLocaleDateString('de-DE', {
+													day: '2-digit',
+													month: '2-digit',
+													year: 'numeric'
+												})}</span
+											>
+											<span
+												class="text-[10px] font-medium opacity-0 transition-opacity group-hover:opacity-100"
+											>
+												{new Date(expense.date).toLocaleDateString('de-DE', { weekday: 'short' })}
+											</span>
+										</div>
+									</Table.Cell>
+									<Table.Cell class="max-w-[300px]">
+										<div class="text-foreground truncate font-medium tracking-tight">
+											{expense.description}
+										</div>
+									</Table.Cell>
+									<Table.Cell>
+										<span
+											class="inline-flex items-center rounded-full bg-blue-50 px-2.5 py-0.5 text-[11px] font-medium text-blue-700 ring-1 ring-blue-700/10 ring-inset dark:bg-blue-900/20 dark:text-blue-400 dark:ring-blue-400/20"
+										>
+											{expense.category}
+										</span>
+									</Table.Cell>
+									<Table.Cell>
+										<div class="flex -space-x-2 overflow-hidden py-1">
+											{#if expense.receiptIds && expense.receiptIds.length > 0}
+												{#each expense.receiptIds as rid, i (rid)}
+													{#if receiptsMap[rid]}
+														<button
+															onclick={() => openPreview(receiptsMap[rid])}
+															class="relative z-[i] inline-block h-9 w-9 overflow-hidden rounded-lg border-2 border-white bg-gray-100 shadow-sm transition-transform hover:z-10 hover:-translate-y-1 hover:scale-110 dark:border-gray-900"
+															title={receiptsMap[rid].fileName}
+														>
+															{#if receiptsMap[rid].fileType.startsWith('image/')}
+																<img
+																	src={objectUrls[rid] || receiptsMap[rid].dataUrl}
+																	alt="Receipt"
+																	class="h-full w-full object-cover"
+																/>
+															{:else}
+																<div
+																	class="flex h-full w-full items-center justify-center bg-blue-50 text-blue-500"
+																>
+																	<FileText size={18} />
+																</div>
+															{/if}
+														</button>
+													{/if}
+												{/each}
+											{:else}
+												<span class="text-muted-foreground text-xs font-medium">Kein Beleg</span>
+											{/if}
+										</div>
+									</Table.Cell>
+									<Table.Cell class="pr-6 text-right">
+										<div
+											class="text-lg font-semibold tracking-tight text-rose-600 dark:text-rose-500"
+										>
+											-{formatCurrency(expense.amount)}
+										</div>
+									</Table.Cell>
+									<Table.Cell class="pr-6 text-right">
+										<div
+											class="flex justify-end gap-1 opacity-0 transition-all duration-200 group-hover:opacity-100"
+										>
+											<Button
+												variant="secondary"
+												size="icon"
+												class="hover:bg-primary hover:text-primary-foreground h-8 w-8 rounded-full shadow-sm"
+												onclick={() => editExpense(expense)}
+											>
+												<Edit size={14} />
+											</Button>
+											<Button
+												variant="secondary"
+												size="icon"
+												class="text-destructive hover:bg-destructive h-8 w-8 rounded-full shadow-sm hover:text-white"
+												onclick={() => confirmDelete(expense.id)}
+											>
+												<Trash2 size={14} />
+											</Button>
+										</div>
+									</Table.Cell>
+								</Table.Row>
+							{/each}
+						{/if}
+					</Table.Body>
+				</Table.Root>
+			</div>
 		</CardContent>
 	</Card>
 </div>
