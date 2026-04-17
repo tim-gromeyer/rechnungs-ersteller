@@ -42,3 +42,14 @@ export function formatDate(dateString: string, locale: string): string {
 	const date = new Date(dateString);
 	return isNaN(date.getTime()) ? dateString : date.toLocaleDateString(locale);
 }
+
+/**
+ * Parses a German currency string like "1.199,00" or "1200,50" into a number.
+ */
+export function parseGermanCurrency(value: string): number {
+	if (!value) return 0;
+	// Remove thousands separator (.) and replace decimal separator (,) with (.)
+	const sanitized = value.replace(/\./g, '').replace(',', '.');
+	const parsed = parseFloat(sanitized);
+	return isNaN(parsed) ? 0 : parsed;
+}

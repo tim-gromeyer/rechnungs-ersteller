@@ -389,11 +389,11 @@
 									<Table.Cell>
 										<div class="flex -space-x-2 overflow-hidden py-1">
 											{#if expense.receiptIds && expense.receiptIds.length > 0}
-												{#each expense.receiptIds as rid, i (rid)}
+												{#each expense.receiptIds as rid (rid)}
 													{#if receiptsMap[rid]}
 														<button
 															onclick={() => openPreview(receiptsMap[rid])}
-															class="relative z-[i] inline-block h-9 w-9 overflow-hidden rounded-lg border-2 border-white bg-gray-100 shadow-sm transition-transform hover:z-10 hover:-translate-y-1 hover:scale-110 dark:border-gray-900"
+															class="relative inline-block h-9 w-9 overflow-hidden rounded-lg border-2 border-white bg-gray-100 shadow-sm transition-transform hover:z-10 hover:-translate-y-1 hover:scale-110 dark:border-gray-900"
 															title={receiptsMap[rid].fileName}
 														>
 															{#if receiptsMap[rid].fileType.startsWith('image/')}

@@ -91,7 +91,9 @@
 		}
 	});
 
-	function requestPdfGeneration(invoiceData: any, previewOnly: boolean = false) {
+	import type { Invoice } from '$lib/types';
+
+	function requestPdfGeneration(invoiceData: Invoice, previewOnly: boolean = false) {
 		if (!pdfWorker) return;
 
 		isGenerating = true;
