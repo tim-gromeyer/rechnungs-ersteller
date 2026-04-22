@@ -1,14 +1,16 @@
 import type { RequestHandler } from './$types';
 
 // Configuration
-const SITE_URL = 'https://your-domain.com'; // TODO: Replace with your actual domain
+const SITE_URL = 'https://gromeyer-it.de';
 const supportedLocales = ['en', 'de'];
 
 // Define your static routes here
 const staticRoutes = [
 	'/', // Home page
-	'/dashboard' // Dashboard page
-	// Add more static routes as needed
+	'/dashboard', // Dashboard page
+	'/legal/impressum',
+	'/legal/privacy',
+	'/legal/accessibility'
 ];
 
 // Function to generate dynamic routes (e.g., from database or CMS)

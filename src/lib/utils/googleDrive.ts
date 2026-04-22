@@ -1,5 +1,4 @@
-import { db } from '../db';
-import { exportDatabase, importDatabase, prepareBackup, type BackupData } from './backup';
+import { importDatabase, prepareBackup, type BackupData } from './backup';
 
 const FILE_NAME = 'invoice_creator_backup.json';
 const SCOPES = 'https://www.googleapis.com/auth/drive.appdata';
@@ -16,9 +15,9 @@ export const googleDriveSync = {
 	async login(): Promise<string> {
 		return new Promise((resolve, reject) => {
 			const client = window.google.accounts.oauth2.initTokenClient({
-				client_id: import.meta.env.VITE_GOOGLE_CLIENT_ID,
+				client_id: import.meta.env.VITE_GOOGLE_CLIENT_ID || '',
 				scope: SCOPES,
-				callback: (response: any) => {
+				callback: (response: { access_token: string; expires_in: number; error?: string }) => {
 					if (response.error) {
 						reject(response);
 					}
@@ -83,7 +82,7 @@ export const googleDriveSync = {
 		return data.files && data.files.length > 0 ? data.files[0].id : null;
 	},
 
-	async updateFile(fileId: string, data: any, token: string) {
+	async updateFile(fileId: string, data: BackupData, token: string) {
 		await fetch(`https://www.googleapis.com/upload/drive/v3/files/${fileId}?uploadType=media`, {
 			method: 'PATCH',
 			headers: {
@@ -94,7 +93,7 @@ export const googleDriveSync = {
 		});
 	},
 
-	async createFile(data: any, token: string) {
+	async createFile(data: BackupData, token: string) {
 		const metadata = {
 			name: FILE_NAME,
 			parents: ['appDataFolder']

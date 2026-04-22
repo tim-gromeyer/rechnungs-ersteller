@@ -180,7 +180,7 @@
 		<div class="grid gap-4">
 			{#each filteredInvoices as invoice (invoice.id)}
 				<Card
-					class="hover:bg-muted/40 group overflow-hidden border-none ring-1 shadow-lg ring-black/[0.05] transition-all duration-300 dark:ring-white/[0.05]"
+					class="hover:bg-muted/40 group overflow-hidden border-none shadow-lg ring-1 ring-black/[0.05] transition-all duration-300 dark:ring-white/[0.05]"
 				>
 					<CardContent
 						class="flex flex-col gap-6 p-6 sm:flex-row sm:items-center sm:justify-between"

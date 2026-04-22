@@ -7,11 +7,14 @@
 		FileText,
 		Receipt,
 		Settings,
-		Github,
+		GitBranch,
 		Menu,
 		X,
-		ChevronLeft
-	} from 'lucide-svelte';
+		ChevronLeft,
+		Scale,
+		ShieldCheck,
+		Accessibility
+	} from '@lucide/svelte';
 	import { Button } from '$lib/components/ui/button';
 	import { cn } from '$lib/utils';
 
@@ -23,6 +26,12 @@
 		{ href: '/invoices', label: () => m.common_invoices(), icon: FileText },
 		{ href: '/expenses', label: () => m.common_expenses(), icon: Receipt },
 		{ href: '/settings', label: () => m.common_settings(), icon: Settings }
+	];
+
+	const legalItems = [
+		{ href: '/legal/impressum', label: () => 'Impressum', icon: Scale },
+		{ href: '/legal/privacy', label: () => 'Datenschutz', icon: ShieldCheck },
+		{ href: '/legal/accessibility', label: () => 'Barrierefreiheit', icon: Accessibility }
 	];
 
 	function isActive(href: string) {
@@ -134,7 +143,39 @@
 		{/each}
 	</nav>
 
-	<div class="mt-auto border-t p-3">
+	<div class="mt-auto space-y-1 border-t p-3">
+		{#each legalItems as item (item.href)}
+			<a
+				href={i18n.resolveRoute(item.href, i18n.getLanguageTag())}
+				class={cn(
+					'group relative flex items-center gap-3 rounded-lg p-2 text-xs font-medium transition-all duration-200',
+					isActive(item.href)
+						? 'bg-primary text-primary-foreground shadow-md'
+						: 'text-muted-foreground hover:bg-muted hover:text-foreground',
+					isCollapsed && 'lg:justify-center lg:px-0'
+				)}
+				onclick={closeMobile}
+				title={isCollapsed ? item.label() : ''}
+			>
+				<item.icon size={18} class="shrink-0" />
+				<span
+					class={cn(
+						'transition-all duration-300',
+						isCollapsed ? 'lg:w-0 lg:scale-0 lg:opacity-0' : 'w-auto scale-100 opacity-100'
+					)}
+				>
+					{item.label()}
+				</span>
+				{#if isCollapsed}
+					<div
+						class="bg-popover text-popover-foreground pointer-events-none absolute left-full ml-4 hidden rounded-md border px-2 py-1 text-xs whitespace-nowrap opacity-0 shadow-lg transition-opacity group-hover:opacity-100 lg:block"
+					>
+						{item.label()}
+					</div>
+				{/if}
+			</a>
+		{/each}
+
 		<a
 			href="https://github.com/tim-gromeyer/rechnungs-ersteller"
 			target="_blank"
@@ -144,7 +185,7 @@
 				isCollapsed && 'lg:justify-center lg:px-0'
 			)}
 		>
-			<Github size={22} class="shrink-0" />
+			<GitBranch size={22} class="shrink-0" />
 			<span
 				class={cn(
 					'transition-all duration-300',

@@ -9,7 +9,23 @@ declare global {
 		// interface Platform {}
 	}
 	interface Window {
-		google: any;
+		google: {
+			accounts: {
+				oauth2: {
+					initTokenClient(config: {
+						client_id: string;
+						scope: string;
+						callback: (response: {
+							access_token: string;
+							expires_in: number;
+							error?: string;
+						}) => void;
+					}): {
+						requestAccessToken(): void;
+					};
+				};
+			};
+		};
 	}
 }
 

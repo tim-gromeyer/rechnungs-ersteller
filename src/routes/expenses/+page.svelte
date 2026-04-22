@@ -311,7 +311,7 @@
 	</div>
 
 	<Card
-		class="overflow-hidden border-none ring-1 shadow-xl ring-black/[0.05] dark:ring-white/[0.05]"
+		class="overflow-hidden border-none shadow-xl ring-1 ring-black/[0.05] dark:ring-white/[0.05]"
 	>
 		<CardContent class="p-0">
 			<div class="overflow-x-auto">

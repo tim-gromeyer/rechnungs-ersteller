@@ -209,7 +209,7 @@
 	<!-- EÜR Metrics -->
 	<div class="grid gap-6 md:grid-cols-4">
 		<Card
-			class="relative overflow-hidden border-none ring-1 shadow-xl ring-black/[0.05] dark:ring-white/[0.05]"
+			class="relative overflow-hidden border-none shadow-xl ring-1 ring-black/[0.05] dark:ring-white/[0.05]"
 		>
 			<div class="absolute inset-x-0 top-0 h-1 bg-green-500"></div>
 			<CardHeader class="pb-2">
@@ -226,7 +226,7 @@
 		</Card>
 
 		<Card
-			class="relative overflow-hidden border-none ring-1 shadow-xl ring-black/[0.05] dark:ring-white/[0.05]"
+			class="relative overflow-hidden border-none shadow-xl ring-1 ring-black/[0.05] dark:ring-white/[0.05]"
 		>
 			<div class="absolute inset-x-0 top-0 h-1 bg-red-500"></div>
 			<CardHeader class="pb-2">
@@ -243,7 +243,7 @@
 		</Card>
 
 		<Card
-			class="relative overflow-hidden border-none ring-1 shadow-xl ring-black/[0.05] dark:ring-white/[0.05]"
+			class="relative overflow-hidden border-none shadow-xl ring-1 ring-black/[0.05] dark:ring-white/[0.05]"
 		>
 			<div class="absolute inset-x-0 top-0 h-1 bg-blue-500"></div>
 			<CardHeader class="pb-2">
@@ -264,7 +264,7 @@
 		</Card>
 
 		<Card
-			class="relative overflow-hidden border-none ring-1 shadow-xl ring-black/[0.05] dark:ring-white/[0.05]"
+			class="relative overflow-hidden border-none shadow-xl ring-1 ring-black/[0.05] dark:ring-white/[0.05]"
 		>
 			<div class="absolute inset-x-0 top-0 h-1 bg-orange-500"></div>
 			<CardHeader class="pb-2">
@@ -350,7 +350,7 @@
 				{:else}
 					{#each journalItems as item (item.id)}
 						<Card
-							class="hover:bg-muted/40 group overflow-hidden border-none ring-1 shadow-md ring-black/[0.05] transition-all duration-300 dark:ring-white/[0.05]"
+							class="hover:bg-muted/40 group overflow-hidden border-none shadow-md ring-1 ring-black/[0.05] transition-all duration-300 dark:ring-white/[0.05]"
 						>
 							<CardContent class="flex items-center justify-between p-5">
 								<div class="flex items-center gap-5">
@@ -428,7 +428,7 @@
 				<div class="grid gap-4">
 					{#each filteredInvoices as invoice (invoice.id)}
 						<Card
-							class="hover:bg-muted/40 group overflow-hidden border-none ring-1 shadow-md ring-black/[0.05] transition-all duration-300 dark:ring-white/[0.05]"
+							class="hover:bg-muted/40 group overflow-hidden border-none shadow-md ring-1 ring-black/[0.05] transition-all duration-300 dark:ring-white/[0.05]"
 						>
 							<CardContent class="flex items-center justify-between p-5">
 								<div class="flex items-center gap-5">
@@ -485,7 +485,7 @@
 				<div class="grid gap-4">
 					{#each filteredExpenses as expense (expense.id)}
 						<Card
-							class="hover:bg-muted/40 group overflow-hidden border-none ring-1 shadow-md ring-black/[0.05] transition-all duration-300 dark:ring-white/[0.05]"
+							class="hover:bg-muted/40 group overflow-hidden border-none shadow-md ring-1 ring-black/[0.05] transition-all duration-300 dark:ring-white/[0.05]"
 						>
 							<CardContent class="flex items-center justify-between p-5">
 								<div class="flex items-center gap-5">

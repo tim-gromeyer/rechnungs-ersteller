@@ -1,3 +1,4 @@
+/// <reference lib="webworker" />
 import { generatePdf } from '../pdf/generator';
 
 import type { Invoice } from '../types';
